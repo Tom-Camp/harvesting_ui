@@ -125,7 +125,7 @@ export default function GardenDetail() {
                   <tr key={plant.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-4 py-3">
                       <Link
-                        to={`/gardens/${garden.slug}/plants/${plant.id}/edit`}
+                        to={`/gardens/${garden.slug}/plants/${plant.id}`}
                         className="font-medium text-gray-900 hover:text-green-700 transition-colors"
                       >
                         {plant.species}

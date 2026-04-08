@@ -44,6 +44,12 @@ type Pages = {
       "gardenSlug": string;
     };
   };
+  "/gardens/:gardenSlug/plants/:plantId": {
+    params: {
+      "gardenSlug": string;
+      "plantId": string;
+    };
+  };
   "/gardens/:gardenSlug/plants/:plantId/edit": {
     params: {
       "gardenSlug": string;
@@ -55,7 +61,7 @@ type Pages = {
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/auth/login" | "/auth/register" | "/auth/logout" | "/gardens" | "/gardens/new" | "/gardens/:gardenSlug" | "/gardens/:gardenSlug/edit" | "/gardens/:gardenSlug/plants/new" | "/gardens/:gardenSlug/plants/:plantId/edit";
+    page: "/" | "/auth/login" | "/auth/register" | "/auth/logout" | "/gardens" | "/gardens/new" | "/gardens/:gardenSlug" | "/gardens/:gardenSlug/edit" | "/gardens/:gardenSlug/plants/new" | "/gardens/:gardenSlug/plants/:plantId" | "/gardens/:gardenSlug/plants/:plantId/edit";
   };
   "routes/home.tsx": {
     id: "routes/home";
@@ -75,7 +81,7 @@ type RouteFiles = {
   };
   "routes/_app.tsx": {
     id: "routes/_app";
-    page: "/gardens" | "/gardens/new" | "/gardens/:gardenSlug" | "/gardens/:gardenSlug/edit" | "/gardens/:gardenSlug/plants/new" | "/gardens/:gardenSlug/plants/:plantId/edit";
+    page: "/gardens" | "/gardens/new" | "/gardens/:gardenSlug" | "/gardens/:gardenSlug/edit" | "/gardens/:gardenSlug/plants/new" | "/gardens/:gardenSlug/plants/:plantId" | "/gardens/:gardenSlug/plants/:plantId/edit";
   };
   "routes/_app.gardens.tsx": {
     id: "routes/_app.gardens";
@@ -87,7 +93,7 @@ type RouteFiles = {
   };
   "routes/_app.gardens.$gardenSlug.tsx": {
     id: "routes/_app.gardens.$gardenSlug";
-    page: "/gardens/:gardenSlug" | "/gardens/:gardenSlug/edit" | "/gardens/:gardenSlug/plants/new" | "/gardens/:gardenSlug/plants/:plantId/edit";
+    page: "/gardens/:gardenSlug" | "/gardens/:gardenSlug/edit" | "/gardens/:gardenSlug/plants/new" | "/gardens/:gardenSlug/plants/:plantId" | "/gardens/:gardenSlug/plants/:plantId/edit";
   };
   "routes/_app.gardens.$gardenSlug.edit.tsx": {
     id: "routes/_app.gardens.$gardenSlug.edit";
@@ -96,6 +102,10 @@ type RouteFiles = {
   "routes/_app.gardens.$gardenSlug.plants.new.tsx": {
     id: "routes/_app.gardens.$gardenSlug.plants.new";
     page: "/gardens/:gardenSlug/plants/new";
+  };
+  "routes/_app.gardens.$gardenSlug.plants.$plantId.tsx": {
+    id: "routes/_app.gardens.$gardenSlug.plants.$plantId";
+    page: "/gardens/:gardenSlug/plants/:plantId";
   };
   "routes/_app.gardens.$gardenSlug.plants.$plantId.edit.tsx": {
     id: "routes/_app.gardens.$gardenSlug.plants.$plantId.edit";
@@ -115,5 +125,6 @@ type RouteModules = {
   "routes/_app.gardens.$gardenSlug": typeof import("./app/routes/_app.gardens.$gardenSlug.tsx");
   "routes/_app.gardens.$gardenSlug.edit": typeof import("./app/routes/_app.gardens.$gardenSlug.edit.tsx");
   "routes/_app.gardens.$gardenSlug.plants.new": typeof import("./app/routes/_app.gardens.$gardenSlug.plants.new.tsx");
+  "routes/_app.gardens.$gardenSlug.plants.$plantId": typeof import("./app/routes/_app.gardens.$gardenSlug.plants.$plantId.tsx");
   "routes/_app.gardens.$gardenSlug.plants.$plantId.edit": typeof import("./app/routes/_app.gardens.$gardenSlug.plants.$plantId.edit.tsx");
 };
