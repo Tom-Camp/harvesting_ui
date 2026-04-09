@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Form, isRouteErrorResponse, Link, redirect, useLoaderData, useNavigation, useRouteError } from "react-router";
 import { getPlant, getPlantCareInfo } from "~/.server/api";
 import { ApiClientError } from "~/lib/api-client";
@@ -36,6 +37,18 @@ export default function PlantView() {
 
   const careInfo = plant.care_info;
   const notes = plant.notes ?? [];
+
+  const careTabs = careInfo
+    ? [
+        { key: "summary", label: "Summary", content: careInfo.summary },
+        { key: "planting", label: "Planting", content: careInfo.planting },
+        { key: "care", label: "Care", content: careInfo.care },
+        { key: "harvesting", label: "Harvesting", content: careInfo.harvesting },
+      ].filter((tab) => tab.content)
+    : [];
+
+  const [activeTab, setActiveTab] = useState(() => careTabs[0]?.key ?? "summary");
+  const activeContent = careTabs.find((t) => t.key === activeTab)?.content;
 
   return (
     <div className="max-w-2xl flex flex-col gap-8">
@@ -85,7 +98,12 @@ export default function PlantView() {
       {careInfo ? (
         <section className="flex flex-col gap-4">
           <div className="flex items-center justify-between gap-4">
-            <h2 className="text-lg font-semibold text-gray-900">Care Information</h2>
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900">Care Information</h2>
+              {careInfo.latin_name && (
+                <p className="text-sm text-gray-400 italic">{careInfo.latin_name}</p>
+              )}
+            </div>
             <Form method="post">
               <button
                 type="submit"
@@ -96,53 +114,33 @@ export default function PlantView() {
               </button>
             </Form>
           </div>
-          <div className="rounded-lg border border-gray-200 bg-white divide-y divide-gray-100">
-            {careInfo.latin_name && (
-              <div className="px-4 py-3">
-                <p className="text-xs font-medium uppercase tracking-wide text-gray-400 mb-0.5">
-                  Latin name
-                </p>
-                <p className="text-sm text-gray-700 italic">{careInfo.latin_name}</p>
+          {careTabs.length > 0 ? (
+            <div className="rounded-lg border border-gray-200 bg-white overflow-hidden">
+              <div className="flex border-b border-gray-200">
+                {careTabs.map((tab) => (
+                  <button
+                    key={tab.key}
+                    type="button"
+                    onClick={() => setActiveTab(tab.key)}
+                    className={`px-4 py-2.5 text-sm font-medium transition-colors ${
+                      activeTab === tab.key
+                        ? "text-green-700 border-b-2 border-green-700 -mb-px bg-white"
+                        : "text-gray-500 hover:text-gray-700"
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
               </div>
-            )}
-            {careInfo.summary && (
-              <div className="px-4 py-3">
-                <p className="text-xs font-medium uppercase tracking-wide text-gray-400 mb-0.5">
-                  Summary
-                </p>
-                <p className="text-sm text-gray-700">{careInfo.summary}</p>
+              <div className="px-4 py-4">
+                <p className="text-sm text-gray-700 whitespace-pre-line">{activeContent}</p>
               </div>
-            )}
-            {careInfo.planting && (
-              <div className="px-4 py-3">
-                <p className="text-xs font-medium uppercase tracking-wide text-gray-400 mb-0.5">
-                  Planting
-                </p>
-                <p className="text-sm text-gray-700 whitespace-pre-line">{careInfo.planting}</p>
-              </div>
-            )}
-            {careInfo.care && (
-              <div className="px-4 py-3">
-                <p className="text-xs font-medium uppercase tracking-wide text-gray-400 mb-0.5">
-                  Care
-                </p>
-                <p className="text-sm text-gray-700 whitespace-pre-line">{careInfo.care}</p>
-              </div>
-            )}
-            {careInfo.harvesting && (
-              <div className="px-4 py-3">
-                <p className="text-xs font-medium uppercase tracking-wide text-gray-400 mb-0.5">
-                  Harvesting
-                </p>
-                <p className="text-sm text-gray-700 whitespace-pre-line">{careInfo.harvesting}</p>
-              </div>
-            )}
-            {!careInfo.latin_name && !careInfo.summary && !careInfo.planting && !careInfo.care && !careInfo.harvesting && (
-              <div className="px-4 py-6 text-center text-sm text-gray-400">
-                No care information available yet.
-              </div>
-            )}
-          </div>
+            </div>
+          ) : (
+            <div className="rounded-lg border border-gray-200 bg-white px-4 py-6 text-center text-sm text-gray-400">
+              No care information available yet.
+            </div>
+          )}
         </section>
       ) : (
         <section className="flex flex-col gap-4">
