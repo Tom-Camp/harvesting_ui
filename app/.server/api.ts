@@ -8,6 +8,9 @@ import type {
   GardenMember,
   GardenUpdatePayload,
   LoginPayload,
+  Note,
+  NoteCreatePayload,
+  NoteUpdatePayload,
   Plant,
   PlantCreatePayload,
   PlantUpdatePayload,
@@ -144,6 +147,43 @@ export async function getPlantCareInfo(
 ): Promise<CareInfo> {
   return client(token).post<CareInfo>(
     `/gardens/${gardenSlug}/plants/${plantId}/care`
+  );
+}
+
+// Notes
+export async function createNote(
+  token: string,
+  gardenSlug: string,
+  plantId: string,
+  data: NoteCreatePayload
+): Promise<Note> {
+  return client(token).post<Note>(
+    `/gardens/${gardenSlug}/plants/${plantId}/notes`,
+    data
+  );
+}
+
+export async function updateNote(
+  token: string,
+  gardenSlug: string,
+  plantId: string,
+  noteId: string,
+  data: NoteUpdatePayload
+): Promise<Note> {
+  return client(token).patch<Note>(
+    `/gardens/${gardenSlug}/plants/${plantId}/notes/${noteId}`,
+    data
+  );
+}
+
+export async function deleteNote(
+  token: string,
+  gardenSlug: string,
+  plantId: string,
+  noteId: string
+): Promise<void> {
+  return client(token).delete(
+    `/gardens/${gardenSlug}/plants/${plantId}/notes/${noteId}`
   );
 }
 

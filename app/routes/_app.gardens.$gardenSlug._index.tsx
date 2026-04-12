@@ -7,16 +7,18 @@ import {
   useOutletContext,
   useRouteError,
 } from "react-router";
-import { deleteGarden } from "~/.server/api";
+import { createNote, deleteGarden, deleteNote, updateNote } from "~/.server/api";
 import { ApiClientError } from "~/lib/api-client";
 import { requireToken } from "~/.server/session";
 import type { Route } from "./+types/_app.gardens.$gardenSlug._index";
 import type { GardenOutletContext } from "./_app.gardens.$gardenSlug";
-import type { Plant, PlantType } from "~/lib/types";
+import type { Note, NoteType, Plant, PlantType } from "~/lib/types";
 import { PlantSidebar } from "~/components/plants/PlantSidebar";
 import { PlantStatusBadge } from "~/components/plants/PlantStatusBadge";
 import { PlantKPICard } from "~/components/plants/PlantKPICard";
 import { PlantNoteTimeline } from "~/components/plants/PlantNoteTimeline";
+import { NoteModal } from "~/components/plants/NoteModal";
+import type { NoteModalState } from "~/components/plants/NoteModal";
 import { Calendar, NotebookPen, Sprout } from "lucide-react";
 
 const plantTypeColors: Record<PlantType, string> = {
@@ -29,10 +31,12 @@ const plantTypeColors: Record<PlantType, string> = {
   vine: "#c08a00",
 };
 
-function daysSince(dateStr: string) {
-  return Math.round(
-    (Date.now() - new Date(dateStr).getTime()) / 86_400_000
-  );
+function growthDuration(dateStr: string): { value: string | number; label: string } {
+  const days = (Date.now() - new Date(dateStr).getTime()) / 86_400_000;
+  if (days >= 365) {
+    return { value: (days / 365).toFixed(1), label: "Years Growing" };
+  }
+  return { value: Math.round(days), label: "Days Growing" };
 }
 
 function plantedFormatted(dateStr: string) {
@@ -53,10 +57,47 @@ export async function action({ request, params }: Route.ActionArgs) {
       await deleteGarden(token, params.gardenSlug);
       return redirect("/gardens");
     } catch (err) {
-      if (err instanceof ApiClientError) {
-        return { error: err.message };
-      }
+      if (err instanceof ApiClientError) return { error: err.message };
       return { error: "Failed to delete garden." };
+    }
+  }
+
+  if (intent === "create_note") {
+    const plantId = String(form.get("plant_id") ?? "");
+    const label = String(form.get("label") ?? "note") as NoteType;
+    const note = String(form.get("note") ?? "") || undefined;
+    try {
+      await createNote(token, params.gardenSlug, plantId, { label, note });
+      return { ok: true };
+    } catch (err) {
+      if (err instanceof ApiClientError) return { error: err.message };
+      return { error: "Failed to create note." };
+    }
+  }
+
+  if (intent === "update_note") {
+    const plantId = String(form.get("plant_id") ?? "");
+    const noteId = String(form.get("note_id") ?? "");
+    const label = (String(form.get("label") ?? "") || undefined) as NoteType | undefined;
+    const note = String(form.get("note") ?? "") || undefined;
+    try {
+      await updateNote(token, params.gardenSlug, plantId, noteId, { label, note });
+      return { ok: true };
+    } catch (err) {
+      if (err instanceof ApiClientError) return { error: err.message };
+      return { error: "Failed to update note." };
+    }
+  }
+
+  if (intent === "delete_note") {
+    const plantId = String(form.get("plant_id") ?? "");
+    const noteId = String(form.get("note_id") ?? "");
+    try {
+      await deleteNote(token, params.gardenSlug, plantId, noteId);
+      return { ok: true };
+    } catch (err) {
+      if (err instanceof ApiClientError) return { error: err.message };
+      return { error: "Failed to delete note." };
     }
   }
 
@@ -78,15 +119,19 @@ function PlantDetail({ plant, gardenSlug }: { plant: Plant; gardenSlug: string }
     : [];
 
   const [activeTab, setActiveTab] = useState(() => careTabs[0]?.key ?? "summary");
+  const [noteModal, setNoteModal] = useState<NoteModalState | null>(null);
 
   return (
     <>
       <header className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h1 className="font-display text-[clamp(1.8rem,2vw+1rem,2.9rem)] leading-none">
+          <h1 className="font-display text-[clamp(1.8rem,2vw+1rem,2.9rem)] leading-none capitalize">
             {plant.variety} {plant.species}
           </h1>
           <p className="mt-2 text-sm text-text-muted sm:text-base">
+            {plant.latin_name && (
+              <><em>{plant.latin_name}</em>{" · "}</>
+            )}
             {plant.planted_date
               ? <>Planted {plantedFormatted(plant.planted_date)}</>
               : "No planting date"}
@@ -104,14 +149,17 @@ function PlantDetail({ plant, gardenSlug }: { plant: Plant; gardenSlug: string }
       </header>
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        {plant.planted_date && (
-          <PlantKPICard
-            label="Days Growing"
-            value={daysSince(plant.planted_date)}
-            meta="since planting"
-            Icon={Calendar}
-          />
-        )}
+        {plant.planted_date && (() => {
+          const { value, label } = growthDuration(plant.planted_date);
+          return (
+            <PlantKPICard
+              label={label}
+              value={value}
+              meta="since planting"
+              Icon={Calendar}
+            />
+          );
+        })()}
         <PlantKPICard
           label="Notes"
           value={notes.length}
@@ -126,7 +174,38 @@ function PlantDetail({ plant, gardenSlug }: { plant: Plant; gardenSlug: string }
         />
       </section>
 
-      <section className="mt-6 grid gap-6 xl:grid-cols-2">
+      <section className="mt-6 gap-6">
+        <article className="rounded-3xl border border-black/10 bg-surface p-5 shadow-soft sm:p-6">
+          <div className="mb-5 flex items-center justify-between">
+            <span className="text-xs font-semibold uppercase tracking-[0.16em] text-text-muted">
+              Garden Log
+            </span>
+            <button
+              onClick={() => setNoteModal({ mode: "create", plantId: plant.id })}
+              className="inline-flex items-center rounded-full bg-primary px-3 py-1.5 text-xs font-medium text-white transition hover:bg-primary-strong"
+            >
+              + Add a Note
+            </button>
+          </div>
+          <PlantNoteTimeline
+            notes={notes}
+            color={color}
+            onNoteClick={(note: Note) =>
+              setNoteModal({ mode: "view", note, plantId: plant.id })
+            }
+          />
+        </article>
+      </section>
+
+      <NoteModal
+        state={noteModal}
+        onClose={() => setNoteModal(null)}
+        onEdit={(note: Note, plantId: string) =>
+          setNoteModal({ mode: "edit", note, plantId })
+        }
+      />
+
+      <section className="mt-6 gap-6">
         {careInfo && careTabs.length > 0 ? (
           <article className="rounded-3xl border border-black/10 bg-surface p-5 shadow-soft sm:p-6">
             <div className="mb-4 text-xs font-semibold uppercase tracking-[0.16em] text-text-muted">
@@ -173,13 +252,6 @@ function PlantDetail({ plant, gardenSlug }: { plant: Plant; gardenSlug: string }
             </div>
           </article>
         )}
-
-        <article className="rounded-3xl border border-black/10 bg-surface p-5 shadow-soft sm:p-6">
-          <div className="mb-5 text-xs font-semibold uppercase tracking-[0.16em] text-text-muted">
-            Garden Log
-          </div>
-          <PlantNoteTimeline notes={notes} color={color} />
-        </article>
       </section>
     </>
   );
