@@ -61,6 +61,7 @@ export interface Plant {
   plant_type: PlantType;
   species: string;
   variety: string | null;
+  latin_name: string | null;
   notes: Note[] | null;
   care_info: CareInfo | null;
   planted_date: string | null;
@@ -131,6 +132,16 @@ export interface PlantUpdatePayload {
   variety?: string;
   notes?: string;
   planted_date?: string;
+}
+
+export interface NoteCreatePayload {
+  label: NoteType;
+  note?: string;
+}
+
+export interface NoteUpdatePayload {
+  label?: NoteType;
+  note?: string;
 }
 
 export interface UserUpdatePayload {

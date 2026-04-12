@@ -3,9 +3,10 @@ import type { Note } from "~/lib/types";
 interface PlantNoteTimelineProps {
   notes: Note[];
   color: string;
+  onNoteClick?: (note: Note) => void;
 }
 
-export function PlantNoteTimeline({ notes, color }: PlantNoteTimelineProps) {
+export function PlantNoteTimeline({ notes, color, onNoteClick }: PlantNoteTimelineProps) {
   const tagClasses = {
     note: 'bg-blue-soft text-blue',
     action: 'bg-primary-soft text-primary',
@@ -31,7 +32,14 @@ export function PlantNoteTimeline({ notes, color }: PlantNoteTimelineProps) {
       {sorted.map((note, idx) => (
         <div
           key={note.id}
-          className="grid grid-cols-[18px_74px_1fr] gap-3 pb-4 last:pb-0"
+          role={onNoteClick ? "button" : undefined}
+          tabIndex={onNoteClick ? 0 : undefined}
+          onClick={onNoteClick ? () => onNoteClick(note) : undefined}
+          onKeyDown={onNoteClick ? (e) => { if (e.key === "Enter" || e.key === " ") onNoteClick(note); } : undefined}
+          className={[
+            "grid grid-cols-[18px_74px_1fr] gap-3 pb-4 last:pb-0",
+            onNoteClick ? "cursor-pointer rounded-xl px-2 -mx-2 hover:bg-black/[0.03] transition-colors" : "",
+          ].join(" ")}
         >
           <div className="flex flex-col items-center">
             <span
