@@ -95,6 +95,10 @@ type RouteFiles = {
     id: "routes/_app.gardens.$gardenSlug";
     page: "/gardens/:gardenSlug" | "/gardens/:gardenSlug/edit" | "/gardens/:gardenSlug/plants/new" | "/gardens/:gardenSlug/plants/:plantId" | "/gardens/:gardenSlug/plants/:plantId/edit";
   };
+  "routes/_app.gardens.$gardenSlug._index.tsx": {
+    id: "routes/_app.gardens.$gardenSlug._index";
+    page: "/gardens/:gardenSlug";
+  };
   "routes/_app.gardens.$gardenSlug.edit.tsx": {
     id: "routes/_app.gardens.$gardenSlug.edit";
     page: "/gardens/:gardenSlug/edit";
@@ -123,6 +127,7 @@ type RouteModules = {
   "routes/_app.gardens": typeof import("./app/routes/_app.gardens.tsx");
   "routes/_app.gardens.new": typeof import("./app/routes/_app.gardens.new.tsx");
   "routes/_app.gardens.$gardenSlug": typeof import("./app/routes/_app.gardens.$gardenSlug.tsx");
+  "routes/_app.gardens.$gardenSlug._index": typeof import("./app/routes/_app.gardens.$gardenSlug._index.tsx");
   "routes/_app.gardens.$gardenSlug.edit": typeof import("./app/routes/_app.gardens.$gardenSlug.edit.tsx");
   "routes/_app.gardens.$gardenSlug.plants.new": typeof import("./app/routes/_app.gardens.$gardenSlug.plants.new.tsx");
   "routes/_app.gardens.$gardenSlug.plants.$plantId": typeof import("./app/routes/_app.gardens.$gardenSlug.plants.$plantId.tsx");

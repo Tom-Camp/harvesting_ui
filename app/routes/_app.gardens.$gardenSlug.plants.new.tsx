@@ -47,10 +47,12 @@ export default function NewPlant() {
   const actionData = useActionData<typeof action>();
 
   return (
+    <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
     <div className="max-w-lg">
       <p className="text-sm text-gray-500 mb-1">{gardenName}</p>
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Add Plant</h1>
       <PlantForm error={actionData?.error} submitLabel="Add plant" />
+    </div>
     </div>
   );
 }

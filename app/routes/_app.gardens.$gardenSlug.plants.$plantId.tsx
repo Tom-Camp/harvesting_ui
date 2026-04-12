@@ -51,6 +51,7 @@ export default function PlantView() {
   const activeContent = careTabs.find((t) => t.key === activeTab)?.content;
 
   return (
+    <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
     <div className="max-w-2xl flex flex-col gap-8">
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
@@ -192,6 +193,7 @@ export default function PlantView() {
           </div>
         )}
       </section>
+    </div>
     </div>
   );
 }

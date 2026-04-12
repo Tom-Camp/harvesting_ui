@@ -1,15 +1,76 @@
 @import "tailwindcss";
 
-@theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif,
-    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+@theme inline {
+  --font-display: "Instrument Serif", Georgia, serif;
+  --font-sans: "Work Sans", system-ui, sans-serif;
+
+  --color-bg: var(--theme-bg);
+  --color-surface: var(--theme-surface);
+  --color-surface-offset: var(--theme-surface-offset);
+  --color-divider: var(--theme-divider);
+  --color-text-main: var(--theme-text-main);
+  --color-text-muted: var(--theme-text-muted);
+  --color-text-faint: var(--theme-text-faint);
+  --color-primary: var(--theme-primary);
+  --color-primary-strong: var(--theme-primary-strong);
+  --color-primary-soft: var(--theme-primary-soft);
+  --color-success: var(--theme-success);
+  --color-success-soft: var(--theme-success-soft);
+  --color-gold: var(--theme-gold);
+  --color-gold-soft: var(--theme-gold-soft);
+  --color-orange: var(--theme-orange);
+  --color-orange-soft: var(--theme-orange-soft);
+  --color-blue: var(--theme-blue);
+  --color-blue-soft: var(--theme-blue-soft);
+
+  --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.06), 0 10px 24px rgba(0, 0, 0, 0.04);
+}
+
+:root {
+  --theme-bg: #f5f4ee;
+  --theme-surface: #faf9f5;
+  --theme-surface-offset: #edeae3;
+  --theme-divider: #dbd8cf;
+  --theme-text-main: #28251d;
+  --theme-text-muted: #7a7974;
+  --theme-text-faint: #b0ae9f;
+  --theme-primary: #3a7a45;
+  --theme-primary-strong: #2d6036;
+  --theme-primary-soft: #d0e5d4;
+  --theme-success: #437a22;
+  --theme-success-soft: #d4dfcc;
+  --theme-gold: #c08a00;
+  --theme-gold-soft: #ede6c6;
+  --theme-orange: #c05800;
+  --theme-orange-soft: #f0dece;
+  --theme-blue: #006494;
+  --theme-blue-soft: #c6d8e4;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --theme-bg: #171614;
+    --theme-surface: #1e1d1b;
+    --theme-surface-offset: #1a1917;
+    --theme-divider: #2e2c29;
+    --theme-text-main: #d2d0cc;
+    --theme-text-muted: #8b8884;
+    --theme-text-faint: #5b5854;
+    --theme-primary: #5fa86c;
+    --theme-primary-strong: #3f8a4f;
+    --theme-primary-soft: #2a3a2d;
+    --theme-success: #6daa45;
+    --theme-success-soft: #2e3f25;
+    --theme-gold: #e8af34;
+    --theme-gold-soft: #3d3620;
+    --theme-orange: #f0883a;
+    --theme-orange-soft: #3e2e1e;
+    --theme-blue: #5591c7;
+    --theme-blue-soft: #1d2e3d;
+  }
 }
 
 html,
 body {
-  @apply bg-white dark:bg-gray-950;
-
-  @media (prefers-color-scheme: dark) {
-    color-scheme: dark;
-  }
+  @apply bg-bg text-text-main antialiased;
 }

@@ -56,6 +56,7 @@ export default function EditPlant() {
   const actionData = useActionData<typeof action>();
 
   return (
+    <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
     <div className="max-w-lg">
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Edit Plant</h1>
       <PlantForm
@@ -63,6 +64,7 @@ export default function EditPlant() {
         error={actionData?.error}
         submitLabel="Save changes"
       />
+    </div>
     </div>
   );
 }

@@ -20,6 +20,7 @@ export default [
       index("routes/_app.gardens.tsx"),
       route("new", "routes/_app.gardens.new.tsx"),
       route(":gardenSlug", "routes/_app.gardens.$gardenSlug.tsx", [
+        index("routes/_app.gardens.$gardenSlug._index.tsx"),
         route("edit", "routes/_app.gardens.$gardenSlug.edit.tsx"),
         route("plants/new", "routes/_app.gardens.$gardenSlug.plants.new.tsx"),
         route(
