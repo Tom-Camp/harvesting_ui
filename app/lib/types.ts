@@ -7,6 +7,16 @@ export type PlantType =
   | "tree"
   | "vine";
 
+export type UnitType =
+  | "items"
+  | "g"
+  | "kg"
+  | "oz"
+  | "lbs"
+  | "bunches"
+  | "bags"
+  | "jars";
+
 export type NoteType = "milestone" | "action" | "note" | "pest" | "harvest";
 
 export type UserStatus = "pending" | "active" | "suspended";
@@ -55,6 +65,15 @@ export interface CareInfo {
   updated_at: string;
 }
 
+export interface Harvest {
+  id: string;
+  plant_id: string;
+  amount: number;
+  unit: UnitType;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Plant {
   id: string;
   garden_id: string;
@@ -62,7 +81,9 @@ export interface Plant {
   species: string;
   variety: string | null;
   latin_name: string | null;
+  harvest_unit: UnitType | null;
   notes: Note[] | null;
+  harvests: Harvest[] | null;
   care_info: CareInfo | null;
   planted_date: string | null;
   created_at: string;
@@ -132,6 +153,16 @@ export interface PlantUpdatePayload {
   variety?: string;
   notes?: string;
   planted_date?: string;
+  harvest_unit?: UnitType;
+}
+
+export interface HarvestCreatePayload {
+  amount: number;
+  unit: UnitType;
+}
+
+export interface HarvestUpdatePayload {
+  amount?: number;
 }
 
 export interface NoteCreatePayload {

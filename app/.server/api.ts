@@ -7,6 +7,9 @@ import type {
   GardenInvitation,
   GardenMember,
   GardenUpdatePayload,
+  Harvest,
+  HarvestCreatePayload,
+  HarvestUpdatePayload,
   LoginPayload,
   Note,
   NoteCreatePayload,
@@ -147,6 +150,43 @@ export async function getPlantCareInfo(
 ): Promise<CareInfo> {
   return client(token).post<CareInfo>(
     `/gardens/${gardenSlug}/plants/${plantId}/care`
+  );
+}
+
+// Harvests
+export async function createHarvest(
+  token: string,
+  gardenSlug: string,
+  plantId: string,
+  data: HarvestCreatePayload
+): Promise<Harvest> {
+  return client(token).post<Harvest>(
+    `/gardens/${gardenSlug}/plants/${plantId}/harvests`,
+    data
+  );
+}
+
+export async function updateHarvest(
+  token: string,
+  gardenSlug: string,
+  plantId: string,
+  harvestId: string,
+  data: HarvestUpdatePayload
+): Promise<Harvest> {
+  return client(token).patch<Harvest>(
+    `/gardens/${gardenSlug}/plants/${plantId}/harvests/${harvestId}`,
+    data
+  );
+}
+
+export async function deleteHarvest(
+  token: string,
+  gardenSlug: string,
+  plantId: string,
+  harvestId: string
+): Promise<void> {
+  return client(token).delete(
+    `/gardens/${gardenSlug}/plants/${plantId}/harvests/${harvestId}`
   );
 }
 

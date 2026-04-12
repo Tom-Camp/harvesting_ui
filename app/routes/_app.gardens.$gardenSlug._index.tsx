@@ -1,25 +1,38 @@
-import { useMemo, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Form,
   isRouteErrorResponse,
   Link,
   redirect,
+  useFetcher,
+  useNavigation,
   useOutletContext,
   useRouteError,
 } from "react-router";
-import { createNote, deleteGarden, deleteNote, updateNote } from "~/.server/api";
+import {
+  createHarvest,
+  createNote,
+  deleteGarden,
+  deleteHarvest,
+  deleteNote,
+  updateHarvest,
+  updateNote,
+} from "~/.server/api";
 import { ApiClientError } from "~/lib/api-client";
 import { requireToken } from "~/.server/session";
 import type { Route } from "./+types/_app.gardens.$gardenSlug._index";
 import type { GardenOutletContext } from "./_app.gardens.$gardenSlug";
-import type { Note, NoteType, Plant, PlantType } from "~/lib/types";
+import type { Harvest, Note, NoteType, Plant, PlantType, UnitType } from "~/lib/types";
 import { PlantSidebar } from "~/components/plants/PlantSidebar";
 import { PlantStatusBadge } from "~/components/plants/PlantStatusBadge";
 import { PlantKPICard } from "~/components/plants/PlantKPICard";
+import { SeasonProgressCard } from "~/components/plants/SeasonProgressCard";
 import { PlantNoteTimeline } from "~/components/plants/PlantNoteTimeline";
 import { NoteModal } from "~/components/plants/NoteModal";
 import type { NoteModalState } from "~/components/plants/NoteModal";
-import { Calendar, NotebookPen, Sprout } from "lucide-react";
+import { HarvestModal } from "~/components/plants/HarvestModal";
+import type { HarvestModalState } from "~/components/plants/HarvestModal";
+import { Calendar, NotebookPen, Sprout, Wheat } from "lucide-react";
 
 const plantTypeColors: Record<PlantType, string> = {
   herb: "#3a7a45",
@@ -101,6 +114,46 @@ export async function action({ request, params }: Route.ActionArgs) {
     }
   }
 
+  if (intent === "create_harvest") {
+    const plantId = String(form.get("plant_id") ?? "");
+    const amount = Number(form.get("amount"));
+    const unit = String(form.get("unit") ?? "") as UnitType;
+    if (!amount || !unit) return { error: "Amount and unit are required." };
+    try {
+      await createHarvest(token, params.gardenSlug, plantId, { amount, unit });
+      return { ok: true };
+    } catch (err) {
+      if (err instanceof ApiClientError) return { error: err.message };
+      return { error: "Failed to record harvest." };
+    }
+  }
+
+  if (intent === "update_harvest") {
+    const plantId = String(form.get("plant_id") ?? "");
+    const harvestId = String(form.get("harvest_id") ?? "");
+    const amountRaw = form.get("amount");
+    const amount = amountRaw ? Number(amountRaw) : undefined;
+    try {
+      await updateHarvest(token, params.gardenSlug, plantId, harvestId, { amount });
+      return { ok: true };
+    } catch (err) {
+      if (err instanceof ApiClientError) return { error: err.message };
+      return { error: "Failed to update harvest." };
+    }
+  }
+
+  if (intent === "delete_harvest") {
+    const plantId = String(form.get("plant_id") ?? "");
+    const harvestId = String(form.get("harvest_id") ?? "");
+    try {
+      await deleteHarvest(token, params.gardenSlug, plantId, harvestId);
+      return { ok: true };
+    } catch (err) {
+      if (err instanceof ApiClientError) return { error: err.message };
+      return { error: "Failed to delete harvest." };
+    }
+  }
+
   return null;
 }
 
@@ -120,6 +173,15 @@ function PlantDetail({ plant, gardenSlug }: { plant: Plant; gardenSlug: string }
 
   const [activeTab, setActiveTab] = useState(() => careTabs[0]?.key ?? "summary");
   const [noteModal, setNoteModal] = useState<NoteModalState | null>(null);
+  const [harvestModal, setHarvestModal] = useState<HarvestModalState | null>(null);
+
+  const harvests = plant.harvests ?? [];
+  const sortedHarvests = [...harvests].sort(
+    (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+  );
+
+  const totalHarvested = harvests.reduce((sum, h) => sum + h.amount, 0);
+  const harvestTotal = totalHarvested % 1 === 0 ? totalHarvested : parseFloat(totalHarvested.toFixed(2));
 
   return (
     <>
@@ -172,9 +234,23 @@ function PlantDetail({ plant, gardenSlug }: { plant: Plant; gardenSlug: string }
           meta={careInfo ? "available" : "not generated"}
           Icon={Sprout}
         />
+        <PlantKPICard
+          label="Total Harvested"
+          value={harvests.length > 0 ? harvestTotal : "—"}
+          meta={
+            harvests.length === 0
+              ? "no harvests yet"
+              : `${plant.harvest_unit} · ${harvests.length} ${harvests.length === 1 ? "harvest" : "harvests"}`
+          }
+          Icon={Wheat}
+        />
+        {plant.planted_date && (
+          <SeasonProgressCard plantedDate={plant.planted_date} />
+        )}
       </section>
 
-      <section className="mt-6 gap-6">
+      {/* Garden Log + Harvest History */}
+      <section className="mt-6 grid gap-6 xl:grid-cols-2">
         <article className="rounded-3xl border border-black/10 bg-surface p-5 shadow-soft sm:p-6">
           <div className="mb-5 flex items-center justify-between">
             <span className="text-xs font-semibold uppercase tracking-[0.16em] text-text-muted">
@@ -195,17 +271,57 @@ function PlantDetail({ plant, gardenSlug }: { plant: Plant; gardenSlug: string }
             }
           />
         </article>
+
+        <article className="rounded-3xl border border-black/10 bg-surface p-5 shadow-soft sm:p-6">
+          <div className="mb-5 flex items-center justify-between">
+            <span className="text-xs font-semibold uppercase tracking-[0.16em] text-text-muted">
+              Harvest History
+            </span>
+            <button
+              onClick={() => setHarvestModal({ mode: "create", plantId: plant.id, harvestUnit: plant.harvest_unit ?? undefined })}
+              className="inline-flex items-center rounded-full bg-primary px-3 py-1.5 text-xs font-medium text-white transition hover:bg-primary-strong"
+            >
+              + Add Harvest
+            </button>
+          </div>
+          {sortedHarvests.length === 0 ? (
+            <div className="py-10 text-center text-sm text-text-faint">
+              No harvests recorded yet
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {sortedHarvests.map((h) => (
+                <button
+                  key={h.id}
+                  onClick={() =>
+                    setHarvestModal({ mode: "view", harvest: h, plantId: plant.id })
+                  }
+                  className="w-full rounded-2xl border border-black/[0.06] bg-bg px-4 py-3 text-left transition hover:bg-black/[0.03]"
+                >
+                  <div className="flex items-baseline justify-between gap-2">
+                    <span className="font-display text-2xl leading-none text-text-main">
+                      {h.amount != null ? h.amount : "—"}
+                      {h.unit && (
+                        <span className="ml-1 text-base text-text-muted">{h.unit}</span>
+                      )}
+                    </span>
+                    <span className="text-xs text-text-faint">
+                      {new Date(h.created_at).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      })}
+                    </span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+        </article>
       </section>
 
-      <NoteModal
-        state={noteModal}
-        onClose={() => setNoteModal(null)}
-        onEdit={(note: Note, plantId: string) =>
-          setNoteModal({ mode: "edit", note, plantId })
-        }
-      />
-
-      <section className="mt-6 gap-6">
+      {/* Care Info */}
+      <section className="mt-6">
         {careInfo && careTabs.length > 0 ? (
           <article className="rounded-3xl border border-black/10 bg-surface p-5 shadow-soft sm:p-6">
             <div className="mb-4 text-xs font-semibold uppercase tracking-[0.16em] text-text-muted">
@@ -253,6 +369,21 @@ function PlantDetail({ plant, gardenSlug }: { plant: Plant; gardenSlug: string }
           </article>
         )}
       </section>
+
+      <NoteModal
+        state={noteModal}
+        onClose={() => setNoteModal(null)}
+        onEdit={(note: Note, plantId: string) =>
+          setNoteModal({ mode: "edit", note, plantId })
+        }
+      />
+      <HarvestModal
+        state={harvestModal}
+        onClose={() => setHarvestModal(null)}
+        onEdit={(harvest: Harvest, plantId: string) =>
+          setHarvestModal({ mode: "edit", harvest, plantId })
+        }
+      />
     </>
   );
 }
@@ -278,10 +409,35 @@ export default function GardenDashboard() {
     () => plants[0]?.id ?? null
   );
 
-  const selectedPlant = useMemo(
-    () => plants.find((p) => p.id === selectedId) ?? null,
-    [plants, selectedId]
-  );
+  // Fetch full plant detail (with harvests/notes) whenever the selection changes.
+  // The list endpoint doesn't include nested relations.
+  const plantFetcher = useFetcher<{ plant: Plant }>();
+  useEffect(() => {
+    if (selectedId) {
+      plantFetcher.load(`/gardens/${garden.slug}/plants/${selectedId}`);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedId, garden.slug]);
+
+  // Re-fetch after any action completes so harvest/note counts stay fresh.
+  const navigation = useNavigation();
+  const prevNavState = useRef(navigation.state);
+  useEffect(() => {
+    if (
+      prevNavState.current === "submitting" &&
+      navigation.state === "idle" &&
+      selectedId
+    ) {
+      plantFetcher.load(`/gardens/${garden.slug}/plants/${selectedId}`);
+    }
+    prevNavState.current = navigation.state;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [navigation.state]);
+
+  // Use the fetched full plant if available, fall back to list data while loading.
+  const selectedPlant =
+    plantFetcher.data?.plant ??
+    (plants.find((p) => p.id === selectedId) ?? null);
 
   return (
     <div className="flex">
@@ -316,7 +472,7 @@ export default function GardenDashboard() {
           </div>
         )}
 
-        <main className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
+        <main className="w-full max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
           {/* Garden header with actions */}
           <div className="mb-8 flex items-center justify-between">
             <div>
