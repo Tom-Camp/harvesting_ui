@@ -7,6 +7,8 @@ export type PlantType =
   | "tree"
   | "vine";
 
+export type NoteType = "milestone" | "action" | "note" | "pest" | "harvest";
+
 export type UserStatus = "pending" | "active" | "suspended";
 export type UserRole = "user" | "admin";
 export type GardenMemberRole = "owner" | "member";
@@ -37,6 +39,7 @@ export interface Garden {
 export interface Note {
   id: string;
   note: string | null;
+  label: NoteType;
   created_at: string;
   updated_at: string;
 }

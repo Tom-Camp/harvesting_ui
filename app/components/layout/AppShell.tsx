@@ -11,11 +11,11 @@ export function AppShell({ user }: AppShellProps) {
     : user.email;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="border-b border-gray-200 bg-white">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
+    <div className="min-h-screen bg-bg">
+      <header className="sticky top-0 z-40 border-b border-black/10 bg-surface/90 backdrop-blur">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-6">
-            <Link to="/gardens" className="text-lg font-bold text-green-700">
+            <Link to="/gardens" className="font-display text-2xl leading-none text-primary">
               harvesting.food
             </Link>
             <nav className="flex items-center gap-4">
@@ -23,7 +23,7 @@ export function AppShell({ user }: AppShellProps) {
                 to="/gardens"
                 className={({ isActive }) =>
                   `text-sm font-medium transition-colors ${
-                    isActive ? "text-green-700" : "text-gray-600 hover:text-gray-900"
+                    isActive ? "text-primary" : "text-text-muted hover:text-text-main"
                   }`
                 }
               >
@@ -32,11 +32,11 @@ export function AppShell({ user }: AppShellProps) {
             </nav>
           </div>
           <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-600">{displayName}</span>
+            <span className="text-sm text-text-muted">{displayName}</span>
             <Form method="post" action="/auth/logout">
               <button
                 type="submit"
-                className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
+                className="text-sm font-medium text-text-muted hover:text-text-main transition-colors"
               >
                 Sign out
               </button>
@@ -44,9 +44,7 @@ export function AppShell({ user }: AppShellProps) {
           </div>
         </div>
       </header>
-      <main className="mx-auto max-w-5xl px-4 py-8">
-        <Outlet />
-      </main>
+      <Outlet />
     </div>
   );
 }
