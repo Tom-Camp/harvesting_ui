@@ -1,5 +1,5 @@
 import { isRouteErrorResponse, Link, Outlet, useLoaderData, useRouteError } from "react-router";
-import { getGarden, listPlants } from "~/.server/api";
+import { getGarden, getPlant, listPlants } from "~/.server/api";
 import { requireToken } from "~/.server/session";
 import type { Route } from "./+types/_app.gardens.$gardenSlug";
 import type { Garden, Plant } from "~/lib/types";
@@ -16,7 +16,10 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     getGarden(token, params.gardenSlug),
     listPlants(token, params.gardenSlug),
   ]);
-  return { garden, plants };
+  const fullPlants = await Promise.all(
+    plants.map((p) => getPlant(token, params.gardenSlug, p.id))
+  );
+  return { garden, plants: fullPlants };
 }
 
 export default function GardenLayout() {
