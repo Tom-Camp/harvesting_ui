@@ -1,5 +1,5 @@
-import { isRouteErrorResponse, Link, Outlet, useLoaderData, useRouteError } from "react-router";
-import { getGarden, getPlant, listPlants } from "~/.server/api";
+import { isRouteErrorResponse, Link, Outlet, redirect, useLoaderData, useRouteError } from "react-router";
+import { deleteGarden, getGarden, getPlant, listPlants } from "~/.server/api";
 import { requireToken } from "~/.server/session";
 import type { Route } from "./+types/_app.gardens.$gardenSlug";
 import type { Garden, Plant } from "~/lib/types";
@@ -8,6 +8,19 @@ export type GardenOutletContext = { garden: Garden; plants: Plant[] };
 
 export function meta({ data }: Route.MetaArgs) {
   return [{ title: `${data?.garden.name ?? "Garden"} — harvesting.food` }];
+}
+
+export async function action({ request, params }: Route.ActionArgs) {
+  const token = await requireToken(request);
+  const formData = await request.formData();
+  const intent = formData.get("intent");
+
+  if (intent === "delete") {
+    await deleteGarden(token, params.gardenSlug);
+    return redirect("/gardens");
+  }
+
+  return null;
 }
 
 export async function loader({ request, params }: Route.LoaderArgs) {

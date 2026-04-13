@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link, useFetcher } from "react-router";
 import type { Garden } from "~/lib/types";
 import { Button } from "~/components/ui/Button";
@@ -9,9 +10,10 @@ interface GardenCardProps {
 export function GardenCard({ garden }: GardenCardProps) {
   const fetcher = useFetcher();
   const isDeleting = fetcher.state !== "idle";
+  const [confirming, setConfirming] = useState(false);
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm flex flex-col gap-3 opacity-100 transition-opacity" style={{ opacity: isDeleting ? 0.5 : 1 }}>
+    <div className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm flex flex-col gap-3 transition-opacity" style={{ opacity: isDeleting ? 0.5 : 1 }}>
       <div className="flex items-start justify-between gap-2">
         <div>
           <Link
@@ -39,17 +41,39 @@ export function GardenCard({ garden }: GardenCardProps) {
         >
           View plants →
         </Link>
-        <fetcher.Form method="post" action={`/gardens/${garden.slug}`}>
-          <input type="hidden" name="intent" value="delete" />
+        {confirming ? (
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-gray-600">Are you sure?</span>
+            <fetcher.Form method="post" action={`/gardens/${garden.slug}`}>
+              <input type="hidden" name="intent" value="delete" />
+              <Button
+                type="submit"
+                variant="danger"
+                isLoading={isDeleting}
+                className="text-xs px-2 py-1"
+              >
+                Confirm
+              </Button>
+            </fetcher.Form>
+            <Button
+              type="button"
+              variant="secondary"
+              className="text-xs px-2 py-1"
+              onClick={() => setConfirming(false)}
+            >
+              Cancel
+            </Button>
+          </div>
+        ) : (
           <Button
-            type="submit"
+            type="button"
             variant="danger"
-            isLoading={isDeleting}
             className="text-xs px-2 py-1"
+            onClick={() => setConfirming(true)}
           >
             Delete
           </Button>
-        </fetcher.Form>
+        )}
       </div>
     </div>
   );
