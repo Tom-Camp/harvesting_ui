@@ -36,7 +36,6 @@ export default function PlantView() {
   const isGenerating = navigation.state === "submitting";
 
   const careInfo = plant.care_info;
-  const notes = plant.notes ?? [];
 
   const careTabs = careInfo
     ? [
@@ -161,38 +160,6 @@ export default function PlantView() {
         </section>
       )}
 
-      {/* Notes */}
-      <section className="flex flex-col gap-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900">
-            Notes{" "}
-            <span className="text-sm font-normal text-gray-500">({notes.length})</span>
-          </h2>
-        </div>
-
-        {notes.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-gray-300 bg-white px-6 py-8 text-center">
-            <p className="text-sm text-gray-400">No notes yet.</p>
-          </div>
-        ) : (
-          <div className="flex flex-col gap-3">
-            {notes.map((note) => (
-              <div key={note.id} className="rounded-lg border border-gray-200 bg-white px-4 py-3">
-                <p className="text-sm text-gray-700 whitespace-pre-line">
-                  {note.note ?? <span className="text-gray-400 italic">Empty note</span>}
-                </p>
-                <p className="mt-2 text-xs text-gray-400">
-                  {new Date(note.created_at).toLocaleDateString(undefined, {
-                    year: "numeric",
-                    month: "short",
-                    day: "numeric",
-                  })}
-                </p>
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
     </div>
     </div>
   );

@@ -1,11 +1,9 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import {
   Form,
   isRouteErrorResponse,
   Link,
   redirect,
-  useFetcher,
-  useNavigation,
   useOutletContext,
   useRouteError,
 } from "react-router";
@@ -32,7 +30,11 @@ import { NoteModal } from "~/components/plants/NoteModal";
 import type { NoteModalState } from "~/components/plants/NoteModal";
 import { HarvestModal } from "~/components/plants/HarvestModal";
 import type { HarvestModalState } from "~/components/plants/HarvestModal";
-import { Calendar, NotebookPen, Sprout, Wheat } from "lucide-react";
+import { Calendar, ChartNoAxesCombined, TrendingUp, Wheat } from "lucide-react";
+import { ProgressRing } from "~/components/ProgressRing";
+import { HarvestTrend } from "~/components/HarvestTrend";
+
+const now = Date.now();
 
 const plantTypeColors: Record<PlantType, string> = {
   herb: "#3a7a45",
@@ -45,7 +47,7 @@ const plantTypeColors: Record<PlantType, string> = {
 };
 
 function growthDuration(dateStr: string): { value: string | number; label: string } {
-  const days = (Date.now() - new Date(dateStr).getTime()) / 86_400_000;
+  const days = (now - new Date(dateStr).getTime()) / 86_400_000;
   if (days >= 365) {
     return { value: (days / 365).toFixed(1), label: "Years Growing" };
   }
@@ -183,6 +185,11 @@ function PlantDetail({ plant, gardenSlug }: { plant: Plant; gardenSlug: string }
   const totalHarvested = harvests.reduce((sum, h) => sum + h.amount, 0);
   const harvestTotal = totalHarvested % 1 === 0 ? totalHarvested : parseFloat(totalHarvested.toFixed(2));
 
+  const daysSincePlanted = plant.planted_date
+    ? Math.floor((now - new Date(plant.planted_date).getTime()) / 86_400_000)
+    : 0;
+  const ringPercent = Math.min(100, Math.round((daysSincePlanted / 365) * 100));
+
   return (
     <>
       <header className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -223,18 +230,6 @@ function PlantDetail({ plant, gardenSlug }: { plant: Plant; gardenSlug: string }
           );
         })()}
         <PlantKPICard
-          label="Notes"
-          value={notes.length}
-          meta={notes.length === 1 ? "note" : "total notes"}
-          Icon={NotebookPen}
-        />
-        <PlantKPICard
-          label="Care Info"
-          value={careInfo ? "Yes" : "—"}
-          meta={careInfo ? "available" : "not generated"}
-          Icon={Sprout}
-        />
-        <PlantKPICard
           label="Total Harvested"
           value={harvests.length > 0 ? harvestTotal : "—"}
           meta={
@@ -249,8 +244,75 @@ function PlantDetail({ plant, gardenSlug }: { plant: Plant; gardenSlug: string }
         )}
       </section>
 
-      {/* Garden Log + Harvest History */}
-      <section className="mt-6 grid gap-6 xl:grid-cols-2">
+      {/*  Harvest History and Season Progress + Harvest Trend */}
+      {plant.planted_date && (
+        <section className="mt-6 grid gap-6 xl:grid-cols-2">
+          <article className="rounded-3xl border border-black/10 bg-surface p-5 shadow-soft sm:p-6">
+            <div className="mb-5 flex items-center justify-between">
+            <span className="text-xs font-semibold uppercase tracking-[0.16em] text-text-muted">
+              Harvest History
+            </span>
+              <button
+                  onClick={() => setHarvestModal({ mode: "create", plantId: plant.id, harvestUnit: plant.harvest_unit ?? undefined })}
+                  className="inline-flex items-center rounded-full bg-primary px-3 py-1.5 text-xs font-medium text-white transition hover:bg-primary-strong"
+              >
+                + Add Harvest
+              </button>
+            </div>
+            {sortedHarvests.length === 0 ? (
+                <div className="py-10 text-center text-sm text-text-faint">
+                  No harvests recorded yet
+                </div>
+            ) : (
+                <div className="space-y-3">
+                  {sortedHarvests.map((h) => (
+                      <button
+                          key={h.id}
+                          onClick={() =>
+                              setHarvestModal({ mode: "view", harvest: h, plantId: plant.id })
+                          }
+                          className="w-full rounded-2xl border border-black/[0.06] bg-bg px-4 py-3 text-left transition hover:bg-black/[0.03]"
+                      >
+                        <div className="flex items-baseline justify-between gap-2">
+                    <span className="font-display text-2xl leading-none text-text-main">
+                      {h.amount != null ? h.amount : "—"}
+                      {h.unit && (
+                          <span className="ml-1 text-base text-text-muted">{h.unit}</span>
+                      )}
+                    </span>
+                          <span className="text-xs text-text-faint">
+                      {new Date(h.created_at).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      })}
+                    </span>
+                        </div>
+                      </button>
+                  ))}
+                </div>
+            )}
+          </article>
+
+          <article className="rounded-3xl border border-black/10 bg-surface p-5 shadow-soft sm:p-6">
+            <div className="mb-4 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-text-muted">
+              <TrendingUp className="h-4 w-4 text-primary" />
+              <span>Season Progress</span>
+            </div>
+            <ProgressRing percent={ringPercent} days={daysSincePlanted} color={color} />
+            <div className="mt-6 border-t border-black/10 pt-5">
+              <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-text-muted">
+                <ChartNoAxesCombined className="h-4 w-4 text-primary" />
+                <span>Harvest Trend</span>
+              </div>
+              <HarvestTrend plant={plant} />
+            </div>
+          </article>
+        </section>
+      )}
+
+      {/* Garden Log */}
+      <section className="mt-6">
         <article className="rounded-3xl border border-black/10 bg-surface p-5 shadow-soft sm:p-6">
           <div className="mb-5 flex items-center justify-between">
             <span className="text-xs font-semibold uppercase tracking-[0.16em] text-text-muted">
@@ -270,53 +332,6 @@ function PlantDetail({ plant, gardenSlug }: { plant: Plant; gardenSlug: string }
               setNoteModal({ mode: "view", note, plantId: plant.id })
             }
           />
-        </article>
-
-        <article className="rounded-3xl border border-black/10 bg-surface p-5 shadow-soft sm:p-6">
-          <div className="mb-5 flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-[0.16em] text-text-muted">
-              Harvest History
-            </span>
-            <button
-              onClick={() => setHarvestModal({ mode: "create", plantId: plant.id, harvestUnit: plant.harvest_unit ?? undefined })}
-              className="inline-flex items-center rounded-full bg-primary px-3 py-1.5 text-xs font-medium text-white transition hover:bg-primary-strong"
-            >
-              + Add Harvest
-            </button>
-          </div>
-          {sortedHarvests.length === 0 ? (
-            <div className="py-10 text-center text-sm text-text-faint">
-              No harvests recorded yet
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {sortedHarvests.map((h) => (
-                <button
-                  key={h.id}
-                  onClick={() =>
-                    setHarvestModal({ mode: "view", harvest: h, plantId: plant.id })
-                  }
-                  className="w-full rounded-2xl border border-black/[0.06] bg-bg px-4 py-3 text-left transition hover:bg-black/[0.03]"
-                >
-                  <div className="flex items-baseline justify-between gap-2">
-                    <span className="font-display text-2xl leading-none text-text-main">
-                      {h.amount != null ? h.amount : "—"}
-                      {h.unit && (
-                        <span className="ml-1 text-base text-text-muted">{h.unit}</span>
-                      )}
-                    </span>
-                    <span className="text-xs text-text-faint">
-                      {new Date(h.created_at).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                      })}
-                    </span>
-                  </div>
-                </button>
-              ))}
-            </div>
-          )}
         </article>
       </section>
 
@@ -409,35 +424,7 @@ export default function GardenDashboard() {
     () => plants[0]?.id ?? null
   );
 
-  // Fetch full plant detail (with harvests/notes) whenever the selection changes.
-  // The list endpoint doesn't include nested relations.
-  const plantFetcher = useFetcher<{ plant: Plant }>();
-  useEffect(() => {
-    if (selectedId) {
-      plantFetcher.load(`/gardens/${garden.slug}/plants/${selectedId}`);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedId, garden.slug]);
-
-  // Re-fetch after any action completes so harvest/note counts stay fresh.
-  const navigation = useNavigation();
-  const prevNavState = useRef(navigation.state);
-  useEffect(() => {
-    if (
-      prevNavState.current === "submitting" &&
-      navigation.state === "idle" &&
-      selectedId
-    ) {
-      plantFetcher.load(`/gardens/${garden.slug}/plants/${selectedId}`);
-    }
-    prevNavState.current = navigation.state;
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [navigation.state]);
-
-  // Use the fetched full plant if available, fall back to list data while loading.
-  const selectedPlant =
-    plantFetcher.data?.plant ??
-    (plants.find((p) => p.id === selectedId) ?? null);
+  const selectedPlant = plants.find((p) => p.id === selectedId) ?? null;
 
   return (
     <div className="flex">
