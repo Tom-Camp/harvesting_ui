@@ -9,7 +9,10 @@
     "typecheck": "react-router typegen && tsc",
     "lint": "eslint app/",
     "commit": "cz",
-    "prepare": "husky"
+    "prepare": "husky",
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:report": "playwright show-report"
   },
   "config": {
     "commitizen": {
@@ -37,6 +40,7 @@
     "@commitlint/config-conventional": "^20.5.0",
     "@commitlint/cz-commitlint": "^20.5.1",
     "@eslint/js": "^9.39.4",
+    "@playwright/test": "^1.59.1",
     "@react-router/dev": "7.14.0",
     "@tailwindcss/vite": "^4.2.2",
     "@types/node": "^22",
