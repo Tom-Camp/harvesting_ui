@@ -4,6 +4,7 @@ import {
   isRouteErrorResponse,
   Link,
   redirect,
+  useNavigation,
   useOutletContext,
   useRouteError,
 } from "react-router";
@@ -13,6 +14,7 @@ import {
   deleteGarden,
   deleteHarvest,
   deleteNote,
+  getPlantCareInfo,
   updateHarvest,
   updateNote,
 } from "~/.server/api";
@@ -156,10 +158,24 @@ export async function action({ request, params }: Route.ActionArgs) {
     }
   }
 
+  if (intent === "generate_care_info") {
+    const plantId = String(form.get("plant_id") ?? "");
+    try {
+      await getPlantCareInfo(token, params.gardenSlug, plantId);
+      return { ok: true };
+    } catch (err) {
+      if (err instanceof ApiClientError) return { error: err.message };
+      return { error: "Failed to generate care information." };
+    }
+  }
+
   return null;
 }
 
 function PlantDetail({ plant, gardenSlug }: { plant: Plant; gardenSlug: string }) {
+  const navigation = useNavigation();
+  const isGeneratingCare = navigation.state === "submitting";
+
   const notes = plant.notes ?? [];
   const careInfo = plant.care_info;
   const color = plantTypeColors[plant.plant_type];
@@ -339,13 +355,26 @@ function PlantDetail({ plant, gardenSlug }: { plant: Plant; gardenSlug: string }
       <section className="mt-6">
         {careInfo && careTabs.length > 0 ? (
           <article className="rounded-3xl border border-black/10 bg-surface p-5 shadow-soft sm:p-6">
-            <div className="mb-4 text-xs font-semibold uppercase tracking-[0.16em] text-text-muted">
-              Care Information
-              {careInfo.latin_name && (
-                <em className="ml-2 not-italic italic text-text-faint">
-                  {careInfo.latin_name}
-                </em>
-              )}
+            <div className="mb-4 flex items-center justify-between">
+              <div className="text-xs font-semibold uppercase tracking-[0.16em] text-text-muted">
+                Care Information
+                {careInfo.latin_name && (
+                  <em className="ml-2 not-italic italic text-text-faint">
+                    {careInfo.latin_name}
+                  </em>
+                )}
+              </div>
+              <Form method="post">
+                <input type="hidden" name="intent" value="generate_care_info" />
+                <input type="hidden" name="plant_id" value={plant.id} />
+                <button
+                  type="submit"
+                  disabled={isGeneratingCare}
+                  className="inline-flex items-center rounded-full border border-black/10 bg-surface px-3 py-1 text-xs font-medium text-text-muted transition hover:bg-surface-offset hover:text-text-main disabled:opacity-50"
+                >
+                  {isGeneratingCare ? "Regenerating…" : "Regenerate"}
+                </button>
+              </Form>
             </div>
             <div className="flex gap-1 border-b border-black/10 pb-0">
               {careTabs.map((tab) => (
@@ -374,12 +403,17 @@ function PlantDetail({ plant, gardenSlug }: { plant: Plant; gardenSlug: string }
             </div>
             <div className="flex flex-col items-center gap-4 py-8 text-center">
               <p className="text-sm text-text-faint">No care information generated yet.</p>
-              <Link
-                to={`/gardens/${gardenSlug}/plants/${plant.id}`}
-                className="inline-flex items-center rounded-full bg-primary px-4 py-2 text-sm font-medium text-white transition hover:bg-primary-strong"
-              >
-                Generate care info →
-              </Link>
+              <Form method="post">
+                <input type="hidden" name="intent" value="generate_care_info" />
+                <input type="hidden" name="plant_id" value={plant.id} />
+                <button
+                  type="submit"
+                  disabled={isGeneratingCare}
+                  className="inline-flex items-center rounded-full bg-primary px-4 py-2 text-sm font-medium text-white transition hover:bg-primary-strong disabled:opacity-50"
+                >
+                  {isGeneratingCare ? "Generating…" : "Generate care info"}
+                </button>
+              </Form>
             </div>
           </article>
         )}
