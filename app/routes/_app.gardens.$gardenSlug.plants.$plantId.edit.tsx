@@ -42,7 +42,7 @@ export async function action({ request, params }: Route.ActionArgs) {
 
   try {
     await updatePlant(token, gardenSlug, plantId, { variety, notes, planted_date });
-    return redirect(`/gardens/${gardenSlug}`);
+    return redirect(`/gardens/${gardenSlug}?plant=${plantId}`);
   } catch (err) {
     if (err instanceof ApiClientError) {
       return { error: err.message };
