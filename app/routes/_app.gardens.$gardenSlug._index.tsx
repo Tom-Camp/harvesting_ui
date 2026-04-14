@@ -7,6 +7,7 @@ import {
   useNavigation,
   useOutletContext,
   useRouteError,
+  useSearchParams,
 } from "react-router";
 import {
   createHarvest,
@@ -453,10 +454,13 @@ function EmptyPlantState({ gardenSlug }: { gardenSlug: string }) {
 
 export default function GardenDashboard() {
   const { garden, plants } = useOutletContext<GardenOutletContext>();
+  const [searchParams] = useSearchParams();
 
-  const [selectedId, setSelectedId] = useState<string | null>(
-    () => plants[0]?.id ?? null
-  );
+  const [selectedId, setSelectedId] = useState<string | null>(() => {
+    const paramId = searchParams.get("plant");
+    if (paramId && plants.some((p) => p.id === paramId)) return paramId;
+    return plants[0]?.id ?? null;
+  });
 
   const selectedPlant = plants.find((p) => p.id === selectedId) ?? null;
 

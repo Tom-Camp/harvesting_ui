@@ -32,8 +32,8 @@ export async function action({ request, params }: Route.ActionArgs) {
   }
 
   try {
-    await createPlant(token, params.gardenSlug, { plant_type, species, variety, planted_date });
-    return redirect(`/gardens/${params.gardenSlug}`);
+    const plant = await createPlant(token, params.gardenSlug, { plant_type, species, variety, planted_date });
+    return redirect(`/gardens/${params.gardenSlug}?plant=${plant.id}`);
   } catch (err) {
     if (err instanceof ApiClientError) {
       return { error: err.message };
