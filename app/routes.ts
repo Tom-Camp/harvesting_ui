@@ -22,14 +22,9 @@ export default [
       route(":gardenSlug", "routes/_app.gardens.$gardenSlug.tsx", [
         index("routes/_app.gardens.$gardenSlug._index.tsx"),
         route("edit", "routes/_app.gardens.$gardenSlug.edit.tsx"),
-        route("plants/new", "routes/_app.gardens.$gardenSlug.plants.new.tsx"),
         route(
           "plants/:plantId",
           "routes/_app.gardens.$gardenSlug.plants.$plantId.tsx"
-        ),
-        route(
-          "plants/:plantId/edit",
-          "routes/_app.gardens.$gardenSlug.plants.$plantId.edit.tsx"
         ),
       ]),
     ]),

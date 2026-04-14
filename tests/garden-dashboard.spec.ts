@@ -107,13 +107,14 @@ test.describe("Garden Dashboard", () => {
     await expect(page).toHaveURL(href!);
   });
 
-  test("plant edit link navigates to edit form", async ({ page }) => {
+  test("plant edit button opens edit modal", async ({ page }) => {
     const href = await getFirstGardenWithPlant(page);
     if (!href) {
       test.skip();
       return;
     }
-    await page.getByRole("link", { name: "Edit", exact: true }).first().click();
-    await expect(page).toHaveURL(/plants\/.*\/edit/);
+    await page.getByRole("button", { name: "Edit", exact: true }).first().click();
+    await expect(page.getByRole("dialog")).toBeVisible();
+    await expect(page.getByRole("dialog").getByText("Edit Plant")).toBeVisible();
   });
 });

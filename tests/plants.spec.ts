@@ -12,17 +12,29 @@ async function navigateToFirstGarden(page: import("@playwright/test").Page) {
   return href;
 }
 
+async function openAddPlantModal(page: import("@playwright/test").Page) {
+  // Try sidebar button first, fall back to empty-state button
+  const sidebarBtn = page.getByRole("button", { name: /^\+ Add plant$/i });
+  const emptyStateBtn = page.getByRole("button", { name: /Add your first plant/i });
+  if (await sidebarBtn.isVisible().catch(() => false)) {
+    await sidebarBtn.click();
+  } else {
+    await emptyStateBtn.click();
+  }
+}
+
 test.describe("Plants", () => {
-  test("add plant page renders form fields", async ({ page }) => {
+  test("add plant modal renders form fields", async ({ page }) => {
     const gardenHref = await navigateToFirstGarden(page);
     if (!gardenHref) {
       test.skip();
       return;
     }
-    await page.goto(`${gardenHref}/plants/new`);
-    await expect(page).toHaveTitle(/Add Plant/);
-    await expect(page.getByLabel("Species")).toBeVisible();
-    await expect(page.getByLabel("Plant type")).toBeVisible();
+    await openAddPlantModal(page);
+    await expect(page.getByRole("dialog")).toBeVisible();
+    await expect(page.getByRole("dialog").getByRole("heading", { name: "Add Plant" })).toBeVisible();
+    await expect(page.getByPlaceholder(/Basil|Tomato|Lavender/)).toBeVisible();
+    await expect(page.getByRole("dialog").getByRole("combobox")).toBeVisible();
   });
 
   test("add plant form shows error when required fields are empty", async ({ page }) => {
@@ -31,23 +43,24 @@ test.describe("Plants", () => {
       test.skip();
       return;
     }
-    await page.goto(`${gardenHref}/plants/new`);
-    await page.getByRole("button", { name: /Add plant/i }).click();
-    await expect(page.locator('input:invalid, select:invalid').first()).toBeVisible();
+    await openAddPlantModal(page);
+    await expect(page.getByRole("dialog")).toBeVisible();
+    await page.getByRole("dialog").getByRole("button", { name: /Add Plant/i }).click();
+    await expect(page.locator("input:invalid, select:invalid").first()).toBeVisible();
   });
 
-  test("creates a new plant and redirects to garden dashboard", async ({ page }) => {
+  test("creates a new plant and closes modal", async ({ page }) => {
     const gardenHref = await navigateToFirstGarden(page);
     if (!gardenHref) {
       test.skip();
       return;
     }
-    await page.goto(`${gardenHref}/plants/new`);
-    await page.getByLabel("Species").fill("Tomato");
-    // Select a plant type
-    const plantTypeSelect = page.getByLabel("Plant type");
-    await plantTypeSelect.selectOption("vegetable");
-    await page.getByRole("button", { name: /Add plant/i }).click();
+    await openAddPlantModal(page);
+    await expect(page.getByRole("dialog")).toBeVisible();
+    await page.getByPlaceholder(/Basil|Tomato|Lavender/).fill("Tomato");
+    await page.getByRole("dialog").getByRole("combobox").selectOption("vegetable");
+    await page.getByRole("dialog").getByRole("button", { name: /Add Plant/i }).click();
+    await expect(page.getByRole("dialog")).not.toBeVisible();
     await expect(page).toHaveURL(gardenHref!);
   });
 
@@ -63,7 +76,7 @@ test.describe("Plants", () => {
     expect(hasPlants || hasEmpty).toBe(true);
   });
 
-  test("garden dashboard shows add plant link when garden is empty", async ({ page }) => {
+  test("garden dashboard shows add plant button when garden is empty", async ({ page }) => {
     const gardenHref = await navigateToFirstGarden(page);
     if (!gardenHref) {
       test.skip();
@@ -74,16 +87,17 @@ test.describe("Plants", () => {
       test.skip();
       return;
     }
-    await expect(page.getByRole("link", { name: /Add your first plant/i })).toBeVisible();
+    await expect(page.getByRole("button", { name: /Add your first plant/i })).toBeVisible();
   });
 
-  test("garden dashboard add plant button navigates to new plant form", async ({ page }) => {
+  test("add plant button opens modal", async ({ page }) => {
     const gardenHref = await navigateToFirstGarden(page);
     if (!gardenHref) {
       test.skip();
       return;
     }
-    await page.goto(`${gardenHref}/plants/new`);
-    await expect(page).toHaveURL(/plants\/new/);
+    await openAddPlantModal(page);
+    await expect(page.getByRole("dialog")).toBeVisible();
+    await expect(page).toHaveURL(gardenHref!);
   });
 });

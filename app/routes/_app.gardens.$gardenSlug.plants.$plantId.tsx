@@ -87,7 +87,7 @@ export default function PlantView() {
           </div>
         </div>
         <Link
-          to={`/gardens/${gardenSlug}/plants/${plant.id}/edit`}
+          to={`/gardens/${gardenSlug}?plant=${plant.id}`}
           className="shrink-0 rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
         >
           Edit plant

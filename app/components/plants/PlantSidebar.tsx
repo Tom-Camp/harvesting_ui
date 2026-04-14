@@ -1,4 +1,3 @@
-import { Link } from "react-router";
 import type { Plant, PlantType } from "~/lib/types";
 
 const plantTypeColors: Record<PlantType, string> = {
@@ -13,18 +12,18 @@ const plantTypeColors: Record<PlantType, string> = {
 
 interface PlantSidebarProps {
   plants: Plant[];
-  gardenSlug: string;
   gardenName: string;
   selectedId: string | null;
   onSelect: (id: string) => void;
+  onAddPlant: () => void;
 }
 
 export function PlantSidebar({
   plants,
-  gardenSlug,
   gardenName,
   selectedId,
   onSelect,
+  onAddPlant,
 }: PlantSidebarProps) {
   return (
     <aside className="hidden lg:sticky lg:top-16 lg:block lg:h-[calc(100vh-4rem)] lg:w-60 lg:shrink-0 lg:overflow-y-auto lg:border-r lg:border-black/10 lg:bg-surface lg:px-3 lg:py-4">
@@ -66,12 +65,12 @@ export function PlantSidebar({
       )}
 
       <div className="mt-4 border-t border-black/10 pt-3">
-        <Link
-          to={`/gardens/${gardenSlug}/plants/new`}
+        <button
+          onClick={onAddPlant}
           className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-sm text-text-muted transition hover:bg-surface-offset hover:text-text-main"
         >
           + Add plant
-        </Link>
+        </button>
       </div>
     </aside>
   );
