@@ -12,18 +12,23 @@ import {
 import {
   createHarvest,
   createNote,
+  createPlant,
   deleteGarden,
   deleteHarvest,
   deleteNote,
+  deletePlant,
   getPlantCareInfo,
   updateHarvest,
   updateNote,
+  updatePlant,
 } from "~/.server/api";
 import { ApiClientError } from "~/lib/api-client";
 import { requireToken } from "~/.server/session";
 import type { Route } from "./+types/_app.gardens.$gardenSlug._index";
 import type { GardenOutletContext } from "./_app.gardens.$gardenSlug";
 import type { Harvest, Note, NoteType, Plant, PlantType, UnitType } from "~/lib/types";
+import { PlantModal } from "~/components/plants/PlantModal";
+import type { PlantModalState } from "~/components/plants/PlantModal";
 import { PlantSidebar } from "~/components/plants/PlantSidebar";
 import { PlantStatusBadge } from "~/components/plants/PlantStatusBadge";
 import { PlantKPICard } from "~/components/plants/PlantKPICard";
@@ -77,6 +82,45 @@ export async function action({ request, params }: Route.ActionArgs) {
     } catch (err) {
       if (err instanceof ApiClientError) return { error: err.message };
       return { error: "Failed to delete garden." };
+    }
+  }
+
+  if (intent === "create_plant") {
+    const plant_type = String(form.get("plant_type") ?? "") as PlantType;
+    const species = String(form.get("species") ?? "");
+    const variety = String(form.get("variety") ?? "") || undefined;
+    const planted_date = String(form.get("planted_date") ?? "") || undefined;
+    if (!species || !plant_type) return { error: "Plant type and species are required." };
+    try {
+      const plant = await createPlant(token, params.gardenSlug, { plant_type, species, variety, planted_date });
+      return { ok: true, plantId: plant.id };
+    } catch (err) {
+      if (err instanceof ApiClientError) return { error: err.message };
+      return { error: "Something went wrong. Please try again." };
+    }
+  }
+
+  if (intent === "update_plant") {
+    const plantId = String(form.get("plant_id") ?? "");
+    const variety = String(form.get("variety") ?? "") || undefined;
+    const planted_date = String(form.get("planted_date") ?? "") || undefined;
+    try {
+      await updatePlant(token, params.gardenSlug, plantId, { variety, planted_date });
+      return { ok: true };
+    } catch (err) {
+      if (err instanceof ApiClientError) return { error: err.message };
+      return { error: "Something went wrong. Please try again." };
+    }
+  }
+
+  if (intent === "delete_plant") {
+    const plantId = String(form.get("plant_id") ?? "");
+    try {
+      await deletePlant(token, params.gardenSlug, plantId);
+      return { ok: true };
+    } catch (err) {
+      if (err instanceof ApiClientError) return { error: err.message };
+      return { error: "Failed to delete plant." };
     }
   }
 
@@ -173,7 +217,13 @@ export async function action({ request, params }: Route.ActionArgs) {
   return null;
 }
 
-function PlantDetail({ plant, gardenSlug }: { plant: Plant; gardenSlug: string }) {
+function PlantDetail({
+  plant,
+  onEditPlant,
+}: {
+  plant: Plant;
+  onEditPlant: () => void;
+}) {
   const navigation = useNavigation();
   const isGeneratingCare = navigation.state === "submitting";
 
@@ -225,12 +275,12 @@ function PlantDetail({ plant, gardenSlug }: { plant: Plant; gardenSlug: string }
         </div>
         <div className="flex items-center gap-2">
           <PlantStatusBadge type={plant.plant_type} />
-          <Link
-            to={`/gardens/${gardenSlug}/plants/${plant.id}/edit`}
+          <button
+            onClick={onEditPlant}
             className="inline-flex items-center rounded-full border border-black/10 bg-surface px-3 py-1 text-xs font-medium text-text-muted transition hover:bg-surface-offset hover:text-text-main"
           >
             Edit
-          </Link>
+          </button>
         </div>
       </header>
 
@@ -438,16 +488,16 @@ function PlantDetail({ plant, gardenSlug }: { plant: Plant; gardenSlug: string }
   );
 }
 
-function EmptyPlantState({ gardenSlug }: { gardenSlug: string }) {
+function EmptyPlantState({ onAddPlant }: { onAddPlant: () => void }) {
   return (
     <div className="flex flex-col items-center gap-4 py-24 text-center">
       <p className="text-text-faint">No plants in this garden yet.</p>
-      <Link
-        to={`/gardens/${gardenSlug}/plants/new`}
+      <button
+        onClick={onAddPlant}
         className="inline-flex items-center rounded-full bg-primary px-4 py-2 text-sm font-medium text-white transition hover:bg-primary-strong"
       >
         Add your first plant →
-      </Link>
+      </button>
     </div>
   );
 }
@@ -462,16 +512,23 @@ export default function GardenDashboard() {
     return plants[0]?.id ?? null;
   });
 
-  const selectedPlant = plants.find((p) => p.id === selectedId) ?? null;
+  const [plantModal, setPlantModal] = useState<PlantModalState | null>(null);
+
+  // If the selected plant was deleted (no longer in the list), fall back to the first plant.
+  const effectiveSelectedId =
+    selectedId && plants.some((p) => p.id === selectedId)
+      ? selectedId
+      : (plants[0]?.id ?? null);
+  const selectedPlant = plants.find((p) => p.id === effectiveSelectedId) ?? null;
 
   return (
     <div className="flex">
       <PlantSidebar
         plants={plants}
-        gardenSlug={garden.slug}
         gardenName={garden.name}
-        selectedId={selectedId}
+        selectedId={effectiveSelectedId}
         onSelect={setSelectedId}
+        onAddPlant={() => setPlantModal({ mode: "create" })}
       />
 
       <div className="min-w-0 flex-1">
@@ -485,7 +542,7 @@ export default function GardenDashboard() {
                   onClick={() => setSelectedId(plant.id)}
                   className={[
                     "whitespace-nowrap rounded-full border px-3 py-1.5 text-sm transition",
-                    selectedId === plant.id
+                    effectiveSelectedId === plant.id
                       ? "border-transparent bg-primary-soft text-primary"
                       : "border-black/10 bg-surface text-text-muted",
                   ].join(" ")}
@@ -537,12 +594,21 @@ export default function GardenDashboard() {
           </div>
 
           {selectedPlant ? (
-            <PlantDetail plant={selectedPlant} gardenSlug={garden.slug} />
+            <PlantDetail
+              plant={selectedPlant}
+              onEditPlant={() => setPlantModal({ mode: "edit", plant: selectedPlant })}
+            />
           ) : (
-            <EmptyPlantState gardenSlug={garden.slug} />
+            <EmptyPlantState onAddPlant={() => setPlantModal({ mode: "create" })} />
           )}
         </main>
       </div>
+
+      <PlantModal
+        state={plantModal}
+        onClose={() => setPlantModal(null)}
+        onCreated={(plantId) => setSelectedId(plantId)}
+      />
     </div>
   );
 }

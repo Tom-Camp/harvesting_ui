@@ -39,7 +39,7 @@ export function GardenCard({ garden }: GardenCardProps) {
           to={`/gardens/${garden.slug}`}
           className="text-sm font-medium text-green-700 hover:underline"
         >
-          View plants →
+          View garden →
         </Link>
         {confirming ? (
           <div className="flex items-center gap-2">
