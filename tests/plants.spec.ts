@@ -62,6 +62,12 @@ test.describe("Plants", () => {
     await page.getByRole("dialog").getByRole("button", { name: /Add Plant/i }).click();
     await expect(page.getByRole("dialog")).not.toBeVisible();
     await expect(page).toHaveURL(gardenHref!);
+
+    // Cleanup: open the edit modal for the plant we just created and delete it
+    await page.getByRole("button", { name: "Edit", exact: true }).first().click();
+    await expect(page.getByRole("dialog")).toBeVisible();
+    page.once("dialog", (dialog) => dialog.accept());
+    await page.getByRole("dialog").getByRole("button", { name: "Delete plant" }).click();
   });
 
   test("plant sidebar shows plant list on garden dashboard", async ({ page }) => {
