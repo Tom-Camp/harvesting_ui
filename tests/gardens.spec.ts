@@ -36,6 +36,11 @@ test.describe("Gardens", () => {
     // Should redirect to the garden dashboard
     await expect(page).toHaveURL(/\/gardens\//);
     await expect(page.getByRole("main").getByText(uniqueName)).toBeVisible();
+
+    // Cleanup: delete the garden we just created
+    page.once("dialog", (dialog) => dialog.accept());
+    await page.getByRole("button", { name: "Delete" }).click();
+    await expect(page).toHaveURL(/\/gardens$/);
   });
 
   test("garden dashboard shows garden name in breadcrumb", async ({ page }) => {
