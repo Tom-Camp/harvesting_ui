@@ -74,3 +74,20 @@ html,
 body {
   @apply bg-bg text-text-main antialiased;
 }
+
+
+/* === TIMELINE === */
+.timeline { display: flex; flex-direction: column; gap: 0; }
+.timeline-item { display: flex; gap: var(--space-3); position: relative; padding-bottom: var(--space-4); }
+.timeline-item:last-child { padding-bottom: 0; }
+.timeline-track { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; width: 20px; }
+.timeline-dot {
+  width: 10px; height: 10px; border-radius: var(--radius-full); flex-shrink: 0;
+  border: 2px solid var(--color-surface); z-index: 1; margin-top: 4px;
+}
+.timeline-line { flex: 1; width: 2px; background: var(--color-divider); margin-top: 2px; }
+.timeline-item:last-child .timeline-line { display: none; }
+.timeline-date { font-size: var(--text-xs); color: var(--color-text-faint); white-space: nowrap; min-width: 72px; padding-top: 2px; }
+.timeline-body { flex: 1; }
+.timeline-text { font-size: var(--text-sm); color: var(--color-text); line-height: 1.5; }
+.timeline-tag { display: inline-block; font-size: var(--text-xs); padding: 1px 8px; border-radius: var(--radius-full); margin-bottom: var(--space-1); font-weight: 600; }
