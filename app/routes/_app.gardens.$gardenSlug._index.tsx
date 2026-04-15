@@ -89,10 +89,11 @@ export async function action({ request, params }: Route.ActionArgs) {
     const plant_type = String(form.get("plant_type") ?? "") as PlantType;
     const species = String(form.get("species") ?? "");
     const variety = String(form.get("variety") ?? "") || undefined;
+    const plot = String(form.get("plot") ?? "") || undefined;
     const planted_date = String(form.get("planted_date") ?? "") || undefined;
     if (!species || !plant_type) return { error: "Plant type and species are required." };
     try {
-      const plant = await createPlant(token, params.gardenSlug, { plant_type, species, variety, planted_date });
+      const plant = await createPlant(token, params.gardenSlug, { plant_type, species, variety, plot, planted_date });
       return { ok: true, plantId: plant.id };
     } catch (err) {
       if (err instanceof ApiClientError) return { error: err.message };
@@ -103,9 +104,10 @@ export async function action({ request, params }: Route.ActionArgs) {
   if (intent === "update_plant") {
     const plantId = String(form.get("plant_id") ?? "");
     const variety = String(form.get("variety") ?? "") || undefined;
+    const plot = String(form.get("plot") ?? "") || undefined;
     const planted_date = String(form.get("planted_date") ?? "") || undefined;
     try {
-      await updatePlant(token, params.gardenSlug, plantId, { variety, planted_date });
+      await updatePlant(token, params.gardenSlug, plantId, { variety, plot, planted_date });
       return { ok: true };
     } catch (err) {
       if (err instanceof ApiClientError) return { error: err.message };
@@ -267,6 +269,9 @@ function PlantDetail({
           <p className="mt-2 text-sm text-text-muted sm:text-base">
             {plant.latin_name && (
               <><em>{plant.latin_name}</em>{" · "}</>
+            )}
+            {plant.plot && (
+              <>Bed {plant.plot}{" · "}</>
             )}
             {plant.planted_date
               ? <>Planted {plantedFormatted(plant.planted_date)}</>

@@ -73,6 +73,7 @@
 html,
 body {
   @apply bg-bg text-text-main antialiased;
+  font-size: 18px;
 }
 
 
