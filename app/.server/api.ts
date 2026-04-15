@@ -18,8 +18,10 @@ import type {
   PlantCreatePayload,
   PlantUpdatePayload,
   RegisterPayload,
+  SetRolePayload,
   TokenResponse,
   User,
+  UserRole,
   UserUpdatePayload,
 } from "~/lib/types";
 
@@ -252,6 +254,28 @@ export async function removeMember(
   userId: string
 ): Promise<void> {
   return client(token).delete(`/gardens/${gardenSlug}/members/${userId}`);
+}
+
+// Admin
+export async function listAdminUsers(token: string): Promise<User[]> {
+  return client(token).get<User[]>("/admin/users");
+}
+
+export async function approveUsers(token: string, userId: string): Promise<User> {
+  return client(token).patch<User>(`/admin/users/${userId}/approve`, {});
+}
+
+export async function suspendUsers(token: string, userId: string): Promise<User> {
+  return client(token).patch<User>(`/admin/users/${userId}/suspend`, {});
+}
+
+export async function setUserRole(
+  token: string,
+  userId: string,
+  role: UserRole
+): Promise<User> {
+  const payload: SetRolePayload = { role };
+  return client(token).patch<User>(`/admin/users/${userId}/role`, payload);
 }
 
 // Invitations

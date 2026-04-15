@@ -183,3 +183,7 @@ export interface UserUpdatePayload {
   last_name?: string;
   picture?: string;
 }
+
+export interface SetRolePayload {
+  role: UserRole;
+}
