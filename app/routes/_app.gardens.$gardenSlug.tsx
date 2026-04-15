@@ -1,10 +1,10 @@
 import { isRouteErrorResponse, Link, Outlet, redirect, useLoaderData, useRouteError } from "react-router";
-import { deleteGarden, getGarden, getPlant, listPlants } from "~/.server/api";
+import { deleteGarden, getGarden, getMe, getPlant, listMembers, listPlants } from "~/.server/api";
 import { requireToken } from "~/.server/session";
 import type { Route } from "./+types/_app.gardens.$gardenSlug";
 import type { Garden, Plant } from "~/lib/types";
 
-export type GardenOutletContext = { garden: Garden; plants: Plant[] };
+export type GardenOutletContext = { garden: Garden; plants: Plant[]; isOwner: boolean };
 
 export function meta({ data }: Route.MetaArgs) {
   return [{ title: `${data?.garden.name ?? "Garden"} — harvesting.food` }];
@@ -25,19 +25,22 @@ export async function action({ request, params }: Route.ActionArgs) {
 
 export async function loader({ request, params }: Route.LoaderArgs) {
   const token = await requireToken(request);
-  const [garden, plants] = await Promise.all([
+  const [garden, plants, members, me] = await Promise.all([
     getGarden(token, params.gardenSlug),
     listPlants(token, params.gardenSlug),
+    listMembers(token, params.gardenSlug),
+    getMe(token),
   ]);
   const fullPlants = await Promise.all(
     plants.map((p) => getPlant(token, params.gardenSlug, p.id))
   );
-  return { garden, plants: fullPlants };
+  const isOwner = members.some((m) => m.user_id === me.id && m.role === "owner");
+  return { garden, plants: fullPlants, isOwner };
 }
 
 export default function GardenLayout() {
-  const { garden, plants } = useLoaderData<typeof loader>();
-  const ctx: GardenOutletContext = { garden, plants };
+  const { garden, plants, isOwner } = useLoaderData<typeof loader>();
+  const ctx: GardenOutletContext = { garden, plants, isOwner };
   return <Outlet context={ctx} />;
 }
 
