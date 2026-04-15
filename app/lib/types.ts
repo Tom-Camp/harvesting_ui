@@ -80,6 +80,7 @@ export interface Plant {
   plant_type: PlantType;
   species: string;
   variety: string | null;
+  plot: string | null;
   latin_name: string | null;
   harvest_unit: UnitType | null;
   notes: Note[] | null;
@@ -146,11 +147,13 @@ export interface PlantCreatePayload {
   plant_type: PlantType;
   species: string;
   variety?: string;
+  plot?: string;
   planted_date?: string;
 }
 
 export interface PlantUpdatePayload {
   variety?: string;
+  plot?: string;
   notes?: string;
   planted_date?: string;
   harvest_unit?: UnitType;

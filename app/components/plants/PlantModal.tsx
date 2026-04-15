@@ -152,6 +152,19 @@ export function PlantModal({ state, onClose, onCreated }: PlantModalProps) {
 
             <div>
               <label className="mb-1.5 block text-xs font-medium text-text-muted">
+                Plot / Bed
+              </label>
+              <input
+                type="text"
+                name="plot"
+                defaultValue={plant?.plot ?? ""}
+                placeholder="e.g. A1, North Bed, Raised Bed 3"
+                className="w-full rounded-xl border border-black/10 bg-surface px-3 py-2 text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-primary/30"
+              />
+            </div>
+
+            <div>
+              <label className="mb-1.5 block text-xs font-medium text-text-muted">
                 Planted date
               </label>
               <input
