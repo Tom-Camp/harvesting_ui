@@ -11,4 +11,4 @@ jobs:
       enable_code_security: true
       fail_on_severity: medium
     secrets:
-      GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
