@@ -10,5 +10,3 @@ jobs:
       codeql_languages: javascript
       enable_code_security: true
       fail_on_severity: medium
-    secrets:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
