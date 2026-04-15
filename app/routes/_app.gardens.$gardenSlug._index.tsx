@@ -17,7 +17,9 @@ import {
   deleteHarvest,
   deleteNote,
   deletePlant,
+  getMe,
   getPlantCareInfo,
+  listMembers,
   updateHarvest,
   updateNote,
   updatePlant,
@@ -77,6 +79,12 @@ export async function action({ request, params }: Route.ActionArgs) {
 
   if (intent === "delete") {
     try {
+      const [me, members] = await Promise.all([
+        getMe(token),
+        listMembers(token, params.gardenSlug),
+      ]);
+      const isOwner = members.some((m) => m.user_id === me.id && m.role === "owner");
+      if (!isOwner) return { error: "Only garden owners can delete this garden." };
       await deleteGarden(token, params.gardenSlug);
       return redirect("/gardens");
     } catch (err) {
@@ -508,7 +516,7 @@ function EmptyPlantState({ onAddPlant }: { onAddPlant: () => void }) {
 }
 
 export default function GardenDashboard() {
-  const { garden, plants } = useOutletContext<GardenOutletContext>();
+  const { garden, plants, isOwner } = useOutletContext<GardenOutletContext>();
   const [searchParams] = useSearchParams();
 
   const [selectedId, setSelectedId] = useState<string | null>(() => {
@@ -576,25 +584,33 @@ export default function GardenDashboard() {
             </div>
             <div className="flex items-center gap-2">
               <Link
+                to={`/gardens/${garden.slug}/members`}
+                className="inline-flex items-center rounded-full border border-black/10 bg-surface px-3 py-1.5 text-xs font-medium text-text-muted transition hover:bg-surface-offset hover:text-text-main"
+              >
+                Members
+              </Link>
+              <Link
                 to={`/gardens/${garden.slug}/edit`}
                 className="inline-flex items-center rounded-full border border-black/10 bg-surface px-3 py-1.5 text-xs font-medium text-text-muted transition hover:bg-surface-offset hover:text-text-main"
               >
                 Edit garden
               </Link>
-              <Form method="post">
-                <input type="hidden" name="intent" value="delete" />
-                <button
-                  type="submit"
-                  className="inline-flex items-center rounded-full border border-red-200/60 bg-surface px-3 py-1.5 text-xs font-medium text-orange transition hover:bg-orange-soft"
-                  onClick={(e) => {
-                    if (!confirm(`Delete "${garden.name}"? This cannot be undone.`)) {
-                      e.preventDefault();
-                    }
-                  }}
-                >
-                  Delete
-                </button>
-              </Form>
+              {isOwner && (
+                <Form method="post">
+                  <input type="hidden" name="intent" value="delete" />
+                  <button
+                    type="submit"
+                    className="inline-flex items-center rounded-full border border-red-200/60 bg-surface px-3 py-1.5 text-xs font-medium text-orange transition hover:bg-orange-soft"
+                    onClick={(e) => {
+                      if (!confirm(`Delete "${garden.name}"? This cannot be undone.`)) {
+                        e.preventDefault();
+                      }
+                    }}
+                  >
+                    Delete
+                  </button>
+                </Form>
+              )}
             </div>
           </div>
 

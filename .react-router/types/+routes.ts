@@ -26,6 +26,11 @@ type Pages = {
   "/admin/users": {
     params: {};
   };
+  "/invitations/:token": {
+    params: {
+      "token": string;
+    };
+  };
   "/gardens": {
     params: {};
   };
@@ -42,6 +47,11 @@ type Pages = {
       "gardenSlug": string;
     };
   };
+  "/gardens/:gardenSlug/members": {
+    params: {
+      "gardenSlug": string;
+    };
+  };
   "/gardens/:gardenSlug/plants/:plantId": {
     params: {
       "gardenSlug": string;
@@ -53,7 +63,7 @@ type Pages = {
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/auth/login" | "/auth/register" | "/auth/logout" | "/admin/users" | "/gardens" | "/gardens/new" | "/gardens/:gardenSlug" | "/gardens/:gardenSlug/edit" | "/gardens/:gardenSlug/plants/:plantId";
+    page: "/" | "/auth/login" | "/auth/register" | "/auth/logout" | "/admin/users" | "/invitations/:token" | "/gardens" | "/gardens/new" | "/gardens/:gardenSlug" | "/gardens/:gardenSlug/edit" | "/gardens/:gardenSlug/members" | "/gardens/:gardenSlug/plants/:plantId";
   };
   "routes/home.tsx": {
     id: "routes/home";
@@ -73,11 +83,15 @@ type RouteFiles = {
   };
   "routes/_app.tsx": {
     id: "routes/_app";
-    page: "/admin/users" | "/gardens" | "/gardens/new" | "/gardens/:gardenSlug" | "/gardens/:gardenSlug/edit" | "/gardens/:gardenSlug/plants/:plantId";
+    page: "/admin/users" | "/invitations/:token" | "/gardens" | "/gardens/new" | "/gardens/:gardenSlug" | "/gardens/:gardenSlug/edit" | "/gardens/:gardenSlug/members" | "/gardens/:gardenSlug/plants/:plantId";
   };
   "routes/_app.admin.users.tsx": {
     id: "routes/_app.admin.users";
     page: "/admin/users";
+  };
+  "routes/_app.invitations.$token.tsx": {
+    id: "routes/_app.invitations.$token";
+    page: "/invitations/:token";
   };
   "routes/_app.gardens.tsx": {
     id: "routes/_app.gardens";
@@ -89,7 +103,7 @@ type RouteFiles = {
   };
   "routes/_app.gardens.$gardenSlug.tsx": {
     id: "routes/_app.gardens.$gardenSlug";
-    page: "/gardens/:gardenSlug" | "/gardens/:gardenSlug/edit" | "/gardens/:gardenSlug/plants/:plantId";
+    page: "/gardens/:gardenSlug" | "/gardens/:gardenSlug/edit" | "/gardens/:gardenSlug/members" | "/gardens/:gardenSlug/plants/:plantId";
   };
   "routes/_app.gardens.$gardenSlug._index.tsx": {
     id: "routes/_app.gardens.$gardenSlug._index";
@@ -98,6 +112,10 @@ type RouteFiles = {
   "routes/_app.gardens.$gardenSlug.edit.tsx": {
     id: "routes/_app.gardens.$gardenSlug.edit";
     page: "/gardens/:gardenSlug/edit";
+  };
+  "routes/_app.gardens.$gardenSlug.members.tsx": {
+    id: "routes/_app.gardens.$gardenSlug.members";
+    page: "/gardens/:gardenSlug/members";
   };
   "routes/_app.gardens.$gardenSlug.plants.$plantId.tsx": {
     id: "routes/_app.gardens.$gardenSlug.plants.$plantId";
@@ -113,10 +131,12 @@ type RouteModules = {
   "routes/auth.logout": typeof import("./app/routes/auth.logout.tsx");
   "routes/_app": typeof import("./app/routes/_app.tsx");
   "routes/_app.admin.users": typeof import("./app/routes/_app.admin.users.tsx");
+  "routes/_app.invitations.$token": typeof import("./app/routes/_app.invitations.$token.tsx");
   "routes/_app.gardens": typeof import("./app/routes/_app.gardens.tsx");
   "routes/_app.gardens.new": typeof import("./app/routes/_app.gardens.new.tsx");
   "routes/_app.gardens.$gardenSlug": typeof import("./app/routes/_app.gardens.$gardenSlug.tsx");
   "routes/_app.gardens.$gardenSlug._index": typeof import("./app/routes/_app.gardens.$gardenSlug._index.tsx");
   "routes/_app.gardens.$gardenSlug.edit": typeof import("./app/routes/_app.gardens.$gardenSlug.edit.tsx");
+  "routes/_app.gardens.$gardenSlug.members": typeof import("./app/routes/_app.gardens.$gardenSlug.members.tsx");
   "routes/_app.gardens.$gardenSlug.plants.$plantId": typeof import("./app/routes/_app.gardens.$gardenSlug.plants.$plantId.tsx");
 };
