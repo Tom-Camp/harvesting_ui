@@ -16,6 +16,7 @@ export default [
 
   // Authenticated routes
   layout("routes/_app.tsx", [
+    route("admin/users", "routes/_app.admin.users.tsx"),
     ...prefix("gardens", [
       index("routes/_app.gardens.tsx"),
       route("new", "routes/_app.gardens.new.tsx"),

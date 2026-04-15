@@ -31,6 +31,18 @@ export function AppShell({ user }: AppShellProps) {
               >
                 My Gardens
               </NavLink>
+              {user.role === "admin" && (
+                <NavLink
+                  to="/admin/users"
+                  className={({ isActive }) =>
+                    `text-sm font-medium transition-colors ${
+                      isActive ? "text-primary" : "text-text-muted hover:text-text-main"
+                    }`
+                  }
+                >
+                  Users
+                </NavLink>
+              )}
             </nav>
           </div>
           <div className="flex items-center gap-4">
