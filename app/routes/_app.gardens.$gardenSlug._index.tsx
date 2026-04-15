@@ -481,6 +481,15 @@ function PlantDetail({
             </div>
           </article>
         )}
+        <div className="rounded-md border border-divider bg-primary-soft mt-5 px-4 py-3">
+          <p className="text-xs font-semibold text-text-main">AI-Generated Content Disclaimer</p>
+          <p className="mt-1 text-xs">
+            This content was generated with the assistance of artificial intelligence. While AI
+            tools can be helpful, they may produce inaccurate, incomplete, or outdated
+            information. Please review and verify any important details before relying on this
+            content.
+          </p>
+        </div>
       </section>
 
       <NoteModal
