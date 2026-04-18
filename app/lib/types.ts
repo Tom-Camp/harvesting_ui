@@ -187,3 +187,12 @@ export interface UserUpdatePayload {
 export interface SetRolePayload {
   role: UserRole;
 }
+
+export interface ForgotPasswordPayload {
+  email: string;
+}
+
+export interface ResetPasswordPayload {
+  token: string;
+  new_password: string;
+}
