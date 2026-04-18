@@ -2,18 +2,28 @@ import { redirect } from "react-router";
 import { ApiClientError, createApiClient } from "~/lib/api-client";
 import type {
   CareInfo,
+  ForgotPasswordPayload,
   Garden,
   GardenCreatePayload,
   GardenInvitation,
   GardenMember,
   GardenUpdatePayload,
+  Harvest,
+  HarvestCreatePayload,
+  HarvestUpdatePayload,
   LoginPayload,
+  Note,
+  NoteCreatePayload,
+  NoteUpdatePayload,
   Plant,
   PlantCreatePayload,
   PlantUpdatePayload,
   RegisterPayload,
+  ResetPasswordPayload,
+  SetRolePayload,
   TokenResponse,
   User,
+  UserRole,
   UserUpdatePayload,
 } from "~/lib/types";
 
@@ -48,6 +58,14 @@ export async function registerUser(
 
 export async function loginUser(data: LoginPayload): Promise<TokenResponse> {
   return client().post<TokenResponse>("/auth/login", data);
+}
+
+export async function forgotPassword(data: ForgotPasswordPayload): Promise<void> {
+  return client().post<void>("/auth/forgot-password", data);
+}
+
+export async function resetPassword(data: ResetPasswordPayload): Promise<void> {
+  return client().post<void>("/auth/reset-password", data);
 }
 
 // Users
@@ -147,6 +165,80 @@ export async function getPlantCareInfo(
   );
 }
 
+// Harvests
+export async function createHarvest(
+  token: string,
+  gardenSlug: string,
+  plantId: string,
+  data: HarvestCreatePayload
+): Promise<Harvest> {
+  return client(token).post<Harvest>(
+    `/gardens/${gardenSlug}/plants/${plantId}/harvests`,
+    data
+  );
+}
+
+export async function updateHarvest(
+  token: string,
+  gardenSlug: string,
+  plantId: string,
+  harvestId: string,
+  data: HarvestUpdatePayload
+): Promise<Harvest> {
+  return client(token).patch<Harvest>(
+    `/gardens/${gardenSlug}/plants/${plantId}/harvests/${harvestId}`,
+    data
+  );
+}
+
+export async function deleteHarvest(
+  token: string,
+  gardenSlug: string,
+  plantId: string,
+  harvestId: string
+): Promise<void> {
+  return client(token).delete(
+    `/gardens/${gardenSlug}/plants/${plantId}/harvests/${harvestId}`
+  );
+}
+
+// Notes
+export async function createNote(
+  token: string,
+  gardenSlug: string,
+  plantId: string,
+  data: NoteCreatePayload
+): Promise<Note> {
+  return client(token).post<Note>(
+    `/gardens/${gardenSlug}/plants/${plantId}/notes`,
+    data
+  );
+}
+
+export async function updateNote(
+  token: string,
+  gardenSlug: string,
+  plantId: string,
+  noteId: string,
+  data: NoteUpdatePayload
+): Promise<Note> {
+  return client(token).patch<Note>(
+    `/gardens/${gardenSlug}/plants/${plantId}/notes/${noteId}`,
+    data
+  );
+}
+
+export async function deleteNote(
+  token: string,
+  gardenSlug: string,
+  plantId: string,
+  noteId: string
+): Promise<void> {
+  return client(token).delete(
+    `/gardens/${gardenSlug}/plants/${plantId}/notes/${noteId}`
+  );
+}
+
 // Garden members
 export async function listMembers(
   token: string,
@@ -172,6 +264,28 @@ export async function removeMember(
   userId: string
 ): Promise<void> {
   return client(token).delete(`/gardens/${gardenSlug}/members/${userId}`);
+}
+
+// Admin
+export async function listAdminUsers(token: string): Promise<User[]> {
+  return client(token).get<User[]>("/admin/users");
+}
+
+export async function approveUsers(token: string, userId: string): Promise<User> {
+  return client(token).patch<User>(`/admin/users/${userId}/approve`, {});
+}
+
+export async function suspendUsers(token: string, userId: string): Promise<User> {
+  return client(token).patch<User>(`/admin/users/${userId}/suspend`, {});
+}
+
+export async function setUserRole(
+  token: string,
+  userId: string,
+  role: UserRole
+): Promise<User> {
+  const payload: SetRolePayload = { role };
+  return client(token).patch<User>(`/admin/users/${userId}/role`, payload);
 }
 
 // Invitations

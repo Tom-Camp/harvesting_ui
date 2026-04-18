@@ -43,6 +43,7 @@ export default function EditGarden() {
   const actionData = useActionData<typeof action>();
 
   return (
+    <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
     <div className="max-w-lg">
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Edit Garden</h1>
       <GardenForm
@@ -51,6 +52,7 @@ export default function EditGarden() {
 
         submitLabel="Save changes"
       />
+    </div>
     </div>
   );
 }

@@ -7,6 +7,18 @@ export type PlantType =
   | "tree"
   | "vine";
 
+export type UnitType =
+  | "items"
+  | "g"
+  | "kg"
+  | "oz"
+  | "lbs"
+  | "bunches"
+  | "bags"
+  | "jars";
+
+export type NoteType = "milestone" | "action" | "note" | "pest" | "harvest";
+
 export type UserStatus = "pending" | "active" | "suspended";
 export type UserRole = "user" | "admin";
 export type GardenMemberRole = "owner" | "member";
@@ -37,6 +49,7 @@ export interface Garden {
 export interface Note {
   id: string;
   note: string | null;
+  label: NoteType;
   created_at: string;
   updated_at: string;
 }
@@ -52,13 +65,26 @@ export interface CareInfo {
   updated_at: string;
 }
 
+export interface Harvest {
+  id: string;
+  plant_id: string;
+  amount: number;
+  unit: UnitType;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Plant {
   id: string;
   garden_id: string;
   plant_type: PlantType;
   species: string;
   variety: string | null;
+  plot: string | null;
+  latin_name: string | null;
+  harvest_unit: UnitType | null;
   notes: Note[] | null;
+  harvests: Harvest[] | null;
   care_info: CareInfo | null;
   planted_date: string | null;
   created_at: string;
@@ -121,17 +147,52 @@ export interface PlantCreatePayload {
   plant_type: PlantType;
   species: string;
   variety?: string;
+  plot?: string;
   planted_date?: string;
 }
 
 export interface PlantUpdatePayload {
   variety?: string;
+  plot?: string;
   notes?: string;
   planted_date?: string;
+  harvest_unit?: UnitType;
+}
+
+export interface HarvestCreatePayload {
+  amount: number;
+  unit: UnitType;
+}
+
+export interface HarvestUpdatePayload {
+  amount?: number;
+}
+
+export interface NoteCreatePayload {
+  label: NoteType;
+  note?: string;
+}
+
+export interface NoteUpdatePayload {
+  label?: NoteType;
+  note?: string;
 }
 
 export interface UserUpdatePayload {
   first_name?: string;
   last_name?: string;
   picture?: string;
+}
+
+export interface SetRolePayload {
+  role: UserRole;
+}
+
+export interface ForgotPasswordPayload {
+  email: string;
+}
+
+export interface ResetPasswordPayload {
+  token: string;
+  new_password: string;
 }

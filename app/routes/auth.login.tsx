@@ -54,13 +54,20 @@ export default function Login() {
           autoComplete="email"
           required
         />
-        <Input
-          label="Password"
-          name="password"
-          type="password"
-          autoComplete="current-password"
-          required
-        />
+        <div className="flex flex-col gap-1">
+          <Input
+            label="Password"
+            name="password"
+            type="password"
+            autoComplete="current-password"
+            required
+          />
+          <div className="text-right">
+            <Link to="/auth/forgot-password" className="text-sm text-green-700 hover:underline">
+              Forgot your password?
+            </Link>
+          </div>
+        </div>
         <Button type="submit" isLoading={isSubmitting}>
           Sign in
         </Button>

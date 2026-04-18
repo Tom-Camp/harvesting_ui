@@ -36,7 +36,6 @@ export default function PlantView() {
   const isGenerating = navigation.state === "submitting";
 
   const careInfo = plant.care_info;
-  const notes = plant.notes ?? [];
 
   const careTabs = careInfo
     ? [
@@ -51,6 +50,7 @@ export default function PlantView() {
   const activeContent = careTabs.find((t) => t.key === activeTab)?.content;
 
   return (
+    <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
     <div className="max-w-2xl flex flex-col gap-8">
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
@@ -87,7 +87,7 @@ export default function PlantView() {
           </div>
         </div>
         <Link
-          to={`/gardens/${gardenSlug}/plants/${plant.id}/edit`}
+          to={`/gardens/${gardenSlug}?plant=${plant.id}`}
           className="shrink-0 rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
         >
           Edit plant
@@ -141,6 +141,15 @@ export default function PlantView() {
               No care information available yet.
             </div>
           )}
+          <div className="rounded-md border border-divider bg-gold-soft px-4 py-3">
+            <p className="text-xs font-semibold text-text-main">AI-Generated Content Disclaimer</p>
+            <p className="mt-1 text-xs text-text-muted">
+              This content was generated with the assistance of artificial intelligence. While AI
+              tools can be helpful, they may produce inaccurate, incomplete, or outdated
+              information. Please review and verify any important details before relying on this
+              content.
+            </p>
+          </div>
         </section>
       ) : (
         <section className="flex flex-col gap-4">
@@ -160,38 +169,7 @@ export default function PlantView() {
         </section>
       )}
 
-      {/* Notes */}
-      <section className="flex flex-col gap-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900">
-            Notes{" "}
-            <span className="text-sm font-normal text-gray-500">({notes.length})</span>
-          </h2>
-        </div>
-
-        {notes.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-gray-300 bg-white px-6 py-8 text-center">
-            <p className="text-sm text-gray-400">No notes yet.</p>
-          </div>
-        ) : (
-          <div className="flex flex-col gap-3">
-            {notes.map((note) => (
-              <div key={note.id} className="rounded-lg border border-gray-200 bg-white px-4 py-3">
-                <p className="text-sm text-gray-700 whitespace-pre-line">
-                  {note.note ?? <span className="text-gray-400 italic">Empty note</span>}
-                </p>
-                <p className="mt-2 text-xs text-gray-400">
-                  {new Date(note.created_at).toLocaleDateString(undefined, {
-                    year: "numeric",
-                    month: "short",
-                    day: "numeric",
-                  })}
-                </p>
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
+    </div>
     </div>
   );
 }

@@ -1,0 +1,87 @@
+import type { Note } from "~/lib/types";
+
+interface PlantNoteTimelineProps {
+  notes: Note[];
+  color: string;
+  onNoteClick?: (note: Note) => void;
+}
+
+export function PlantNoteTimeline({ notes, color, onNoteClick }: PlantNoteTimelineProps) {
+  const tagClasses = {
+    note: 'bg-blue-soft text-blue',
+    action: 'bg-primary-soft text-primary',
+    pest: 'bg-orange-soft text-orange',
+    harvest: 'bg-gold-soft text-gold',
+    milestone: 'bg-success-soft text-success',
+  } as const;
+
+  const emojiMap = {
+    note: '👁',
+    action: '🛠',
+    pest: '⚠️',
+    harvest: '🌾',
+    milestone: '🎯',
+  } as const;
+
+  const toTitleCase = (s: string) =>
+    s
+      .split(/[\s-_]+/)
+      .map((w) => (w ? w[0].toUpperCase() + w.slice(1) : w))
+      .join(' ');
+
+  if (notes.length === 0) {
+    return (
+      <div className="py-10 text-center text-sm text-text-faint">
+        No notes yet
+      </div>
+    );
+  }
+
+  const sorted = [...notes].sort(
+    (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+  );
+
+  return (
+    <div className="space-y-0">
+      {sorted.map((note, idx) => (
+        <div
+          key={note.id}
+          role={onNoteClick ? "button" : undefined}
+          tabIndex={onNoteClick ? 0 : undefined}
+          onClick={onNoteClick ? () => onNoteClick(note) : undefined}
+          onKeyDown={onNoteClick ? (e) => { if (e.key === "Enter" || e.key === " ") onNoteClick(note); } : undefined}
+          className={[
+            "grid grid-cols-[18px_74px_1fr] gap-3 pb-4 last:pb-0",
+            onNoteClick ? "cursor-pointer rounded-xl px-2 -mx-2 hover:bg-black/[0.03] transition-colors" : "",
+          ].join(" ")}
+        >
+          <div className="timeline-track flex flex-col items-center">
+            <span
+              className="z-10 mt-1 h-2.5 w-2.5 rounded-full border-2 border-surface"
+              style={{ backgroundColor: color }}
+            />
+            {idx !== sorted.length - 1 && (
+              <span className="mt-1 block w-px flex-1 bg-divider" />
+            )}
+          </div>
+          <div className="timeline-date">
+            {new Date(note.created_at).toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+            })}
+          </div>
+          <div>
+            <span className={`mb-1 inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold tracking-[0.04em] ${tagClasses[note.label]}`}>
+               {emojiMap[note.label] ?? ''} {toTitleCase(note.label)}
+            </span>
+            <div className="timeline-text">
+              {note.note ?? (
+                <span className="italic text-text-faint">Empty note</span>
+              )}
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
