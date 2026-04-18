@@ -23,6 +23,12 @@ type Pages = {
   "/auth/logout": {
     params: {};
   };
+  "/auth/forgot-password": {
+    params: {};
+  };
+  "/auth/reset-password": {
+    params: {};
+  };
   "/admin/users": {
     params: {};
   };
@@ -63,7 +69,7 @@ type Pages = {
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/auth/login" | "/auth/register" | "/auth/logout" | "/admin/users" | "/invitations/:token" | "/gardens" | "/gardens/new" | "/gardens/:gardenSlug" | "/gardens/:gardenSlug/edit" | "/gardens/:gardenSlug/members" | "/gardens/:gardenSlug/plants/:plantId";
+    page: "/" | "/auth/login" | "/auth/register" | "/auth/logout" | "/auth/forgot-password" | "/auth/reset-password" | "/admin/users" | "/invitations/:token" | "/gardens" | "/gardens/new" | "/gardens/:gardenSlug" | "/gardens/:gardenSlug/edit" | "/gardens/:gardenSlug/members" | "/gardens/:gardenSlug/plants/:plantId";
   };
   "routes/home.tsx": {
     id: "routes/home";
@@ -80,6 +86,14 @@ type RouteFiles = {
   "routes/auth.logout.tsx": {
     id: "routes/auth.logout";
     page: "/auth/logout";
+  };
+  "routes/auth.forgot-password.tsx": {
+    id: "routes/auth.forgot-password";
+    page: "/auth/forgot-password";
+  };
+  "routes/auth.reset-password.tsx": {
+    id: "routes/auth.reset-password";
+    page: "/auth/reset-password";
   };
   "routes/_app.tsx": {
     id: "routes/_app";
@@ -129,6 +143,8 @@ type RouteModules = {
   "routes/auth.login": typeof import("./app/routes/auth.login.tsx");
   "routes/auth.register": typeof import("./app/routes/auth.register.tsx");
   "routes/auth.logout": typeof import("./app/routes/auth.logout.tsx");
+  "routes/auth.forgot-password": typeof import("./app/routes/auth.forgot-password.tsx");
+  "routes/auth.reset-password": typeof import("./app/routes/auth.reset-password.tsx");
   "routes/_app": typeof import("./app/routes/_app.tsx");
   "routes/_app.admin.users": typeof import("./app/routes/_app.admin.users.tsx");
   "routes/_app.invitations.$token": typeof import("./app/routes/_app.invitations.$token.tsx");

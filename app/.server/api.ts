@@ -2,6 +2,7 @@ import { redirect } from "react-router";
 import { ApiClientError, createApiClient } from "~/lib/api-client";
 import type {
   CareInfo,
+  ForgotPasswordPayload,
   Garden,
   GardenCreatePayload,
   GardenInvitation,
@@ -18,6 +19,7 @@ import type {
   PlantCreatePayload,
   PlantUpdatePayload,
   RegisterPayload,
+  ResetPasswordPayload,
   SetRolePayload,
   TokenResponse,
   User,
@@ -56,6 +58,14 @@ export async function registerUser(
 
 export async function loginUser(data: LoginPayload): Promise<TokenResponse> {
   return client().post<TokenResponse>("/auth/login", data);
+}
+
+export async function forgotPassword(data: ForgotPasswordPayload): Promise<void> {
+  return client().post<void>("/auth/forgot-password", data);
+}
+
+export async function resetPassword(data: ResetPasswordPayload): Promise<void> {
+  return client().post<void>("/auth/reset-password", data);
 }
 
 // Users
