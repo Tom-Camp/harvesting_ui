@@ -9,6 +9,7 @@
     "typecheck": "react-router typegen && tsc",
     "lint": "eslint app/",
     "commit": "cz",
+    "release": "standard-version",
     "prepare": "husky",
     "test": "playwright test",
     "test:ui": "playwright test --ui",
