@@ -70,3 +70,6 @@ app/
   lib/            # Types and API client
   routes/         # React Router route modules
 ```
+
+
+<!-- Fix #35 -->
