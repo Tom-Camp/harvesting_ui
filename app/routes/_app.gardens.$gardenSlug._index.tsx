@@ -3,7 +3,6 @@ import {
   Form,
   isRouteErrorResponse,
   Link,
-  redirect,
   useNavigation,
   useOutletContext,
   useRouteError,
@@ -13,13 +12,10 @@ import {
   createHarvest,
   createNote,
   createPlant,
-  deleteGarden,
   deleteHarvest,
   deleteNote,
   deletePlant,
-  getMe,
   getPlantCareInfo,
-  listMembers,
   updateHarvest,
   updateNote,
   updatePlant,
@@ -76,22 +72,6 @@ export async function action({ request, params }: Route.ActionArgs) {
   const token = await requireToken(request);
   const form = await request.formData();
   const intent = form.get("intent");
-
-  if (intent === "delete") {
-    try {
-      const [me, members] = await Promise.all([
-        getMe(token),
-        listMembers(token, params.gardenSlug),
-      ]);
-      const isOwner = members.some((m) => m.user_id === me.id && m.role === "owner");
-      if (!isOwner) return { error: "Only garden owners can delete this garden." };
-      await deleteGarden(token, params.gardenSlug);
-      return redirect("/gardens");
-    } catch (err) {
-      if (err instanceof ApiClientError) return { error: err.message };
-      return { error: "Failed to delete garden." };
-    }
-  }
 
   if (intent === "create_plant") {
     const plant_type = String(form.get("plant_type") ?? "") as PlantType;
@@ -525,7 +505,7 @@ function EmptyPlantState({ onAddPlant }: { onAddPlant: () => void }) {
 }
 
 export default function GardenDashboard() {
-  const { garden, plants, isOwner } = useOutletContext<GardenOutletContext>();
+  const { garden, plants } = useOutletContext<GardenOutletContext>();
   const [searchParams] = useSearchParams();
 
   const [selectedId, setSelectedId] = useState<string | null>(() => {
@@ -604,22 +584,6 @@ export default function GardenDashboard() {
               >
                 Edit garden
               </Link>
-              {isOwner && (
-                <Form method="post">
-                  <input type="hidden" name="intent" value="delete" />
-                  <button
-                    type="submit"
-                    className="inline-flex items-center rounded-full border border-red-200/60 bg-surface px-3 py-1.5 text-xs font-medium text-orange transition hover:bg-orange-soft"
-                    onClick={(e) => {
-                      if (!confirm(`Delete "${garden.name}"? This cannot be undone.`)) {
-                        e.preventDefault();
-                      }
-                    }}
-                  >
-                    Delete
-                  </button>
-                </Form>
-              )}
             </div>
           </div>
 
