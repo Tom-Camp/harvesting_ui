@@ -54,22 +54,18 @@ export default function Register() {
     <AuthShell title="Create your account">
       <Form method="post" className="flex flex-col gap-5">
         <FormError message={actionData?.error} />
-        <div className="flex gap-4">
-          <Input
-            label="First name"
-            name="first_name"
-            type="text"
-            autoComplete="given-name"
-            className="flex-1"
-          />
-          <Input
-            label="Last name"
-            name="last_name"
-            type="text"
-            autoComplete="family-name"
-            className="flex-1"
-          />
-        </div>
+        <Input
+          label="First name"
+          name="first_name"
+          type="text"
+          autoComplete="given-name"
+        />
+        <Input
+          label="Last name"
+          name="last_name"
+          type="text"
+          autoComplete="family-name"
+        />
         <Input
           label="Email"
           name="email"
