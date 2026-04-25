@@ -42,10 +42,10 @@ function PlantButton({
         className="h-2.5 w-2.5 shrink-0 rounded-full"
         style={{ backgroundColor: plantTypeColors[plant.plant_type] }}
       />
-      <span className="truncate">
+      <span className="truncate capitalize">
         {plant.species}
         {plant.variety && (
-          <em className="ml-1 not-italic text-text-faint">{plant.variety}</em>
+          <em className="ml-1 not-italic text-text-faint capitalize">{plant.variety}</em>
         )}
       </span>
     </button>
@@ -77,7 +77,7 @@ export function PlantSidebar({
     }
     const sortedPlots = [...byPlot.keys()].sort((a, b) => a.localeCompare(b));
     for (const plot of sortedPlots) {
-      grouped.push({ label: plot, plants: byPlot.get(plot)! });
+      grouped.push({ label: plot, plants: byPlot.get(plot)!.sort(sortPlants) });
     }
     if (unplotted.length > 0) {
       grouped.push({ label: null, plants: unplotted });
