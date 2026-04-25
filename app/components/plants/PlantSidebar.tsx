@@ -77,7 +77,7 @@ export function PlantSidebar({
     }
     const sortedPlots = [...byPlot.keys()].sort((a, b) => a.localeCompare(b));
     for (const plot of sortedPlots) {
-      grouped.push({ label: plot, plants: byPlot.get(plot)!.sort(sortPlants) });
+      grouped.push({ label: plot, plants: byPlot.get(plot)! });
     }
     if (unplotted.length > 0) {
       grouped.push({ label: null, plants: unplotted });
@@ -99,7 +99,7 @@ export function PlantSidebar({
         grouped.map(({ label, plants: group }, i) => (
           <div key={label ?? "__unplotted"} className={i > 0 ? "mt-3" : undefined}>
             <div className="px-3 pb-0.5 pt-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-text-faint">
-              {label ? `Plot ${label}` : "Other"}
+              {label ? `${label}` : "Other"}
             </div>
             {group.map((plant) => (
               <PlantButton
