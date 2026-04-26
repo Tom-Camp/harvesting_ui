@@ -1,3 +1,4 @@
+import { LayoutDashboard } from "lucide-react";
 import type { Plant, PlantType } from "~/lib/types";
 
 const plantTypeColors: Record<PlantType, string> = {
@@ -14,8 +15,10 @@ interface PlantSidebarProps {
   plants: Plant[];
   gardenName: string;
   selectedId: string | null;
+  showDashboard: boolean;
   onSelect: (id: string) => void;
   onAddPlant: () => void;
+  onShowDashboard: () => void;
 }
 
 function PlantButton({
@@ -56,8 +59,10 @@ export function PlantSidebar({
   plants,
   gardenName,
   selectedId,
+  showDashboard,
   onSelect,
   onAddPlant,
+  onShowDashboard,
 }: PlantSidebarProps) {
   const hasPlots = plants.some((p) => p.plot);
 
@@ -86,6 +91,21 @@ export function PlantSidebar({
 
   return (
     <aside className="hidden lg:sticky lg:top-16 lg:block lg:h-[calc(100vh-4rem)] lg:w-60 lg:shrink-0 lg:overflow-y-auto lg:border-r lg:border-black/10 lg:bg-surface lg:px-3 lg:py-4">
+      <button
+        onClick={onShowDashboard}
+        className={[
+          "flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm transition",
+          showDashboard
+            ? "bg-primary-soft font-semibold text-primary"
+            : "text-text-muted hover:bg-surface-offset hover:text-text-main",
+        ].join(" ")}
+      >
+        <LayoutDashboard className="h-3.5 w-3.5 shrink-0" />
+        Dashboard
+      </button>
+
+      <div className="my-2 border-t border-black/10" />
+
       <div className="px-2 pb-3 pt-1">
         <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-faint">
           {gardenName}
