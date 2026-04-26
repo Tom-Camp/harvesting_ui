@@ -1,3 +1,4 @@
+import { LayoutDashboard } from "lucide-react";
 import type { Plant, PlantType } from "~/lib/types";
 
 const plantTypeColors: Record<PlantType, string> = {
@@ -14,8 +15,10 @@ interface PlantSidebarProps {
   plants: Plant[];
   gardenName: string;
   selectedId: string | null;
+  showDashboard: boolean;
   onSelect: (id: string) => void;
   onAddPlant: () => void;
+  onShowDashboard: () => void;
 }
 
 function PlantButton({
@@ -42,10 +45,10 @@ function PlantButton({
         className="h-2.5 w-2.5 shrink-0 rounded-full"
         style={{ backgroundColor: plantTypeColors[plant.plant_type] }}
       />
-      <span className="truncate">
+      <span className="truncate capitalize">
         {plant.species}
         {plant.variety && (
-          <em className="ml-1 not-italic text-text-faint">{plant.variety}</em>
+          <em className="ml-1 not-italic text-text-faint capitalize">{plant.variety}</em>
         )}
       </span>
     </button>
@@ -56,8 +59,10 @@ export function PlantSidebar({
   plants,
   gardenName,
   selectedId,
+  showDashboard,
   onSelect,
   onAddPlant,
+  onShowDashboard,
 }: PlantSidebarProps) {
   const hasPlots = plants.some((p) => p.plot);
 
@@ -86,6 +91,21 @@ export function PlantSidebar({
 
   return (
     <aside className="hidden lg:sticky lg:top-16 lg:block lg:h-[calc(100vh-4rem)] lg:w-60 lg:shrink-0 lg:overflow-y-auto lg:border-r lg:border-black/10 lg:bg-surface lg:px-3 lg:py-4">
+      <button
+        onClick={onShowDashboard}
+        className={[
+          "flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm transition",
+          showDashboard
+            ? "bg-primary-soft font-semibold text-primary"
+            : "text-text-muted hover:bg-surface-offset hover:text-text-main",
+        ].join(" ")}
+      >
+        <LayoutDashboard className="h-3.5 w-3.5 shrink-0" />
+        Dashboard
+      </button>
+
+      <div className="my-2 border-t border-black/10" />
+
       <div className="px-2 pb-3 pt-1">
         <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-faint">
           {gardenName}
@@ -99,7 +119,7 @@ export function PlantSidebar({
         grouped.map(({ label, plants: group }, i) => (
           <div key={label ?? "__unplotted"} className={i > 0 ? "mt-3" : undefined}>
             <div className="px-3 pb-0.5 pt-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-text-faint">
-              {label ? `Plot ${label}` : "Other"}
+              {label ? `${label}` : "Other"}
             </div>
             {group.map((plant) => (
               <PlantButton

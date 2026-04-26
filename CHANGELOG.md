@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.1](https://github.com/Tom-Camp/harvesting_ui/compare/v0.2.0...v0.2.1) (2026-04-26)
+
+
+### Features
+
+* **dashboard:** adding a garden dashboard ([380300a](https://github.com/Tom-Camp/harvesting_ui/commit/380300a3bdc57d407754d8ff9d9cba7e9805e7cc)), closes [#48](https://github.com/Tom-Camp/harvesting_ui/issues/48)
+* **GardenForm:** adding location explanation ([389ce37](https://github.com/Tom-Camp/harvesting_ui/commit/389ce37cf7f21faba83a46704ff63c75c89e5895)), closes [#49](https://github.com/Tom-Camp/harvesting_ui/issues/49)
+
+
+### Bug Fixes
+
+* **garden:** moving delete button ([d9833ca](https://github.com/Tom-Camp/harvesting_ui/commit/d9833ca3c1609eeffa48b3f028704f21bd0367ae)), closes [#39](https://github.com/Tom-Camp/harvesting_ui/issues/39)
+* **register:** fixing reg form layout ([bcbd3b7](https://github.com/Tom-Camp/harvesting_ui/commit/bcbd3b7b334465fd0ab80cede6fcf6b892fb7c50)), closes [#34](https://github.com/Tom-Camp/harvesting_ui/issues/34)
+* **sidebar:** removing plot prefix ([faa2d41](https://github.com/Tom-Camp/harvesting_ui/commit/faa2d4198b31077a38bf00d9727a978235848aad))
+* **sidebar:** title casing plant names ([731357b](https://github.com/Tom-Camp/harvesting_ui/commit/731357bfa08e87eb15ce15de345015543af5ffd2)), closes [#35](https://github.com/Tom-Camp/harvesting_ui/issues/35)
+
 ## 0.2.0 (2026-04-18)
 
 

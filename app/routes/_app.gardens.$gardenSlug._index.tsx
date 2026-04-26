@@ -3,7 +3,6 @@ import {
   Form,
   isRouteErrorResponse,
   Link,
-  redirect,
   useNavigation,
   useOutletContext,
   useRouteError,
@@ -13,13 +12,10 @@ import {
   createHarvest,
   createNote,
   createPlant,
-  deleteGarden,
   deleteHarvest,
   deleteNote,
   deletePlant,
-  getMe,
   getPlantCareInfo,
-  listMembers,
   updateHarvest,
   updateNote,
   updatePlant,
@@ -28,7 +24,7 @@ import { ApiClientError } from "~/lib/api-client";
 import { requireToken } from "~/.server/session";
 import type { Route } from "./+types/_app.gardens.$gardenSlug._index";
 import type { GardenOutletContext } from "./_app.gardens.$gardenSlug";
-import type { Harvest, Note, NoteType, Plant, PlantType, UnitType } from "~/lib/types";
+import type { Garden, Harvest, Note, NoteType, Plant, PlantType, UnitType } from "~/lib/types";
 import { PlantModal } from "~/components/plants/PlantModal";
 import type { PlantModalState } from "~/components/plants/PlantModal";
 import { PlantSidebar } from "~/components/plants/PlantSidebar";
@@ -40,7 +36,7 @@ import { NoteModal } from "~/components/plants/NoteModal";
 import type { NoteModalState } from "~/components/plants/NoteModal";
 import { HarvestModal } from "~/components/plants/HarvestModal";
 import type { HarvestModalState } from "~/components/plants/HarvestModal";
-import { Calendar, ChartNoAxesCombined, TrendingUp, Wheat } from "lucide-react";
+import { Calendar, ChartNoAxesCombined, Leaf, Sprout, TrendingUp, Wheat } from "lucide-react";
 import { ProgressRing } from "~/components/ProgressRing";
 import { HarvestTrend } from "~/components/HarvestTrend";
 
@@ -76,22 +72,6 @@ export async function action({ request, params }: Route.ActionArgs) {
   const token = await requireToken(request);
   const form = await request.formData();
   const intent = form.get("intent");
-
-  if (intent === "delete") {
-    try {
-      const [me, members] = await Promise.all([
-        getMe(token),
-        listMembers(token, params.gardenSlug),
-      ]);
-      const isOwner = members.some((m) => m.user_id === me.id && m.role === "owner");
-      if (!isOwner) return { error: "Only garden owners can delete this garden." };
-      await deleteGarden(token, params.gardenSlug);
-      return redirect("/gardens");
-    } catch (err) {
-      if (err instanceof ApiClientError) return { error: err.message };
-      return { error: "Failed to delete garden." };
-    }
-  }
 
   if (intent === "create_plant") {
     const plant_type = String(form.get("plant_type") ?? "") as PlantType;
@@ -510,37 +490,125 @@ function PlantDetail({
   );
 }
 
-function EmptyPlantState({ onAddPlant }: { onAddPlant: () => void }) {
+function GardenDashboardView({
+  garden,
+  plants,
+  onAddPlant,
+}: {
+  garden: Garden;
+  plants: Plant[];
+  onAddPlant: () => void;
+}) {
+  const ageMs = now - new Date(garden.created_at).getTime();
+  const ageYears = ageMs / (365.25 * 86_400_000);
+  const ageDisplay =
+    ageYears >= 1
+      ? `${Math.floor(ageYears)} yr${Math.floor(ageYears) !== 1 ? "s" : ""}`
+      : `${Math.max(1, Math.round(ageYears * 12))} mo`;
+
+  const byType = plants.reduce<Partial<Record<PlantType, number>>>((acc, p) => {
+    acc[p.plant_type] = (acc[p.plant_type] ?? 0) + 1;
+    return acc;
+  }, {});
+  const typeEntries = (Object.entries(byType) as [PlantType, number][]).sort(
+    (a, b) => b[1] - a[1]
+  );
+
+  const lastAdded = plants.reduce<Plant | null>(
+    (latest, p) =>
+      !latest || new Date(p.created_at) > new Date(latest.created_at) ? p : latest,
+    null
+  );
+
   return (
-    <div className="flex flex-col items-center gap-4 py-24 text-center">
-      <p className="text-text-faint">No plants in this garden yet.</p>
-      <button
-        onClick={onAddPlant}
-        className="inline-flex items-center rounded-full bg-primary px-4 py-2 text-sm font-medium text-white transition hover:bg-primary-strong"
-      >
-        Add your first plant →
-      </button>
-    </div>
+    <>
+      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <PlantKPICard
+          label="Garden Age"
+          value={ageDisplay}
+          meta="since the garden was created"
+          Icon={Calendar}
+        />
+        <PlantKPICard
+          label="Total Plants"
+          value={plants.length}
+          meta={
+            typeEntries.length === 0
+              ? "no plants yet"
+              : `across ${typeEntries.length} type${typeEntries.length !== 1 ? "s" : ""}`
+          }
+          Icon={Sprout}
+        />
+        {lastAdded && (
+          <PlantKPICard
+            label="Last Plant Added"
+            value={lastAdded.species}
+            meta={new Date(lastAdded.created_at).toLocaleDateString("en-US", {
+              month: "long",
+              day: "numeric",
+              year: "numeric",
+            })}
+            Icon={Leaf}
+          />
+        )}
+      </section>
+
+      {typeEntries.length > 0 && (
+        <section className="mt-6">
+          <article className="rounded-3xl border border-black/10 bg-surface p-5 shadow-soft sm:p-6">
+            <div className="mb-4 text-xs font-semibold uppercase tracking-[0.16em] text-text-muted">
+              Plants by Type
+            </div>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4">
+              {typeEntries.map(([type, count]) => (
+                <div
+                  key={type}
+                  className="flex items-center gap-2.5 rounded-2xl border border-black/[0.06] bg-bg px-4 py-3"
+                >
+                  <span
+                    className="h-2.5 w-2.5 shrink-0 rounded-full"
+                    style={{ backgroundColor: plantTypeColors[type] }}
+                  />
+                  <div>
+                    <p className="text-sm font-medium capitalize text-text-main">{type}</p>
+                    <p className="text-xs text-text-faint">
+                      {count} plant{count !== 1 ? "s" : ""}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </article>
+        </section>
+      )}
+
+      <div className="mt-8">
+        <button
+          onClick={onAddPlant}
+          className="inline-flex items-center rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-white transition hover:bg-primary-strong"
+        >
+          + Add a plant
+        </button>
+      </div>
+    </>
   );
 }
 
 export default function GardenDashboard() {
-  const { garden, plants, isOwner } = useOutletContext<GardenOutletContext>();
+  const { garden, plants } = useOutletContext<GardenOutletContext>();
   const [searchParams] = useSearchParams();
 
   const [selectedId, setSelectedId] = useState<string | null>(() => {
     const paramId = searchParams.get("plant");
     if (paramId && plants.some((p) => p.id === paramId)) return paramId;
-    return plants[0]?.id ?? null;
+    return null;
   });
 
   const [plantModal, setPlantModal] = useState<PlantModalState | null>(null);
 
-  // If the selected plant was deleted (no longer in the list), fall back to the first plant.
+  // If the selected plant was deleted fall back to the dashboard (null).
   const effectiveSelectedId =
-    selectedId && plants.some((p) => p.id === selectedId)
-      ? selectedId
-      : (plants[0]?.id ?? null);
+    selectedId !== null && plants.some((p) => p.id === selectedId) ? selectedId : null;
   const selectedPlant = plants.find((p) => p.id === effectiveSelectedId) ?? null;
 
   return (
@@ -549,32 +617,43 @@ export default function GardenDashboard() {
         plants={plants}
         gardenName={garden.name}
         selectedId={effectiveSelectedId}
+        showDashboard={effectiveSelectedId === null}
         onSelect={setSelectedId}
         onAddPlant={() => setPlantModal({ mode: "create" })}
+        onShowDashboard={() => setSelectedId(null)}
       />
 
       <div className="min-w-0 flex-1">
         {/* Mobile: horizontal tab bar */}
-        {plants.length > 0 && (
-          <div className="border-b border-black/10 px-4 py-3 lg:hidden">
-            <div className="flex gap-2 overflow-x-auto pb-1">
-              {plants.map((plant) => (
-                <button
-                  key={plant.id}
-                  onClick={() => setSelectedId(plant.id)}
-                  className={[
-                    "whitespace-nowrap rounded-full border px-3 py-1.5 text-sm transition",
-                    effectiveSelectedId === plant.id
-                      ? "border-transparent bg-primary-soft text-primary"
-                      : "border-black/10 bg-surface text-text-muted",
-                  ].join(" ")}
-                >
-                  {plant.species}
-                </button>
-              ))}
-            </div>
+        <div className="border-b border-black/10 px-4 py-3 lg:hidden">
+          <div className="flex gap-2 overflow-x-auto pb-1">
+            <button
+              onClick={() => setSelectedId(null)}
+              className={[
+                "whitespace-nowrap rounded-full border px-3 py-1.5 text-sm transition",
+                effectiveSelectedId === null
+                  ? "border-transparent bg-primary-soft text-primary"
+                  : "border-black/10 bg-surface text-text-muted",
+              ].join(" ")}
+            >
+              Dashboard
+            </button>
+            {plants.map((plant) => (
+              <button
+                key={plant.id}
+                onClick={() => setSelectedId(plant.id)}
+                className={[
+                  "whitespace-nowrap rounded-full border px-3 py-1.5 text-sm transition",
+                  effectiveSelectedId === plant.id
+                    ? "border-transparent bg-primary-soft text-primary"
+                    : "border-black/10 bg-surface text-text-muted",
+                ].join(" ")}
+              >
+                {plant.species}
+              </button>
+            ))}
           </div>
-        )}
+        </div>
 
         <main className="w-full max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
           {/* Garden header with actions */}
@@ -604,22 +683,6 @@ export default function GardenDashboard() {
               >
                 Edit garden
               </Link>
-              {isOwner && (
-                <Form method="post">
-                  <input type="hidden" name="intent" value="delete" />
-                  <button
-                    type="submit"
-                    className="inline-flex items-center rounded-full border border-red-200/60 bg-surface px-3 py-1.5 text-xs font-medium text-orange transition hover:bg-orange-soft"
-                    onClick={(e) => {
-                      if (!confirm(`Delete "${garden.name}"? This cannot be undone.`)) {
-                        e.preventDefault();
-                      }
-                    }}
-                  >
-                    Delete
-                  </button>
-                </Form>
-              )}
             </div>
           </div>
 
@@ -629,7 +692,11 @@ export default function GardenDashboard() {
               onEditPlant={() => setPlantModal({ mode: "edit", plant: selectedPlant })}
             />
           ) : (
-            <EmptyPlantState onAddPlant={() => setPlantModal({ mode: "create" })} />
+            <GardenDashboardView
+              garden={garden}
+              plants={plants}
+              onAddPlant={() => setPlantModal({ mode: "create" })}
+            />
           )}
         </main>
       </div>

@@ -18,7 +18,7 @@ export async function loader({ request }: Route.LoaderArgs) {
     throw redirect("/gardens");
   }
   const users = await listAdminUsers(token);
-  return { users };
+  return { users, currentUserId: currentUser.id };
 }
 
 export async function action({ request }: Route.ActionArgs) {
@@ -31,6 +31,10 @@ export async function action({ request }: Route.ActionArgs) {
     if (intent === "approve") {
       await approveUsers(token, userId);
     } else if (intent === "suspend") {
+      const currentUser = await getMe(token);
+      if (userId === String(currentUser.id)) {
+        return { error: "You cannot suspend your own account." };
+      }
       await suspendUsers(token, userId);
     } else if (intent === "set-role") {
       const role = String(form.get("role") ?? "") as UserRole;
@@ -65,7 +69,7 @@ const ROLE_CLASSES: Record<UserRole, string> = {
 };
 
 export default function AdminUsers() {
-  const { users } = useLoaderData<typeof loader>();
+  const { users, currentUserId } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
 
   return (
@@ -152,7 +156,7 @@ export default function AdminUsers() {
                             </Button>
                           </form>
                         )}
-                        {user.status === "active" && (
+                        {user.status === "active" && user.id !== currentUserId && (
                           <form method="post">
                             <input type="hidden" name="intent" value="suspend" />
                             <input type="hidden" name="userId" value={user.id} />
