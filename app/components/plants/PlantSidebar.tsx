@@ -66,6 +66,13 @@ export function PlantSidebar({
 }: PlantSidebarProps) {
   const hasPlots = plants.some((p) => p.plot);
 
+  const sortPlants = (list: Plant[]) =>
+    [...list].sort((a, b) => {
+      const s = a.species.localeCompare(b.species);
+      if (s !== 0) return s;
+      return (a.variety ?? "").localeCompare(b.variety ?? "");
+    });
+
   // Build ordered groups: named plots (sorted), then unplotted plants
   const grouped: { label: string | null; plants: Plant[] }[] = [];
   if (hasPlots) {
@@ -82,10 +89,10 @@ export function PlantSidebar({
     }
     const sortedPlots = [...byPlot.keys()].sort((a, b) => a.localeCompare(b));
     for (const plot of sortedPlots) {
-      grouped.push({ label: plot, plants: byPlot.get(plot)! });
+      grouped.push({ label: plot, plants: sortPlants(byPlot.get(plot)!) });
     }
     if (unplotted.length > 0) {
-      grouped.push({ label: null, plants: unplotted });
+      grouped.push({ label: null, plants: sortPlants(unplotted) });
     }
   }
 
@@ -132,7 +139,7 @@ export function PlantSidebar({
           </div>
         ))
       ) : (
-        plants.map((plant) => (
+        sortPlants(plants).map((plant) => (
           <PlantButton
             key={plant.id}
             plant={plant}
