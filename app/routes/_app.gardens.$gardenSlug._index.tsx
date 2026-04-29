@@ -411,13 +411,20 @@ function PlantDetail({
               <Form method="post">
                 <input type="hidden" name="intent" value="generate_care_info" />
                 <input type="hidden" name="plant_id" value={plant.id} />
-                <button
-                  type="submit"
-                  disabled={isGeneratingCare}
-                  className="inline-flex items-center rounded-full border border-black/10 bg-surface px-3 py-1 text-xs font-medium text-text-muted transition hover:bg-surface-offset hover:text-text-main disabled:opacity-50"
-                >
-                  {isGeneratingCare ? "Regenerating…" : "Regenerate"}
-                </button>
+                <span className="group relative">
+                  <button
+                    type="submit"
+                    disabled={isGeneratingCare}
+                    className="inline-flex items-center rounded-full border border-black/10 bg-surface px-3 py-1 text-xs font-medium text-text-muted transition hover:bg-surface-offset hover:text-text-main disabled:pointer-events-none disabled:opacity-50"
+                  >
+                    {isGeneratingCare ? "Regenerating…" : "Regenerate"}
+                  </button>
+                  <span className="pointer-events-none absolute bottom-full right-0 mb-1.5 w-max max-w-[180px] rounded-lg bg-gray-900 px-2.5 py-1.5 text-center text-[11px] leading-snug text-white opacity-0 shadow-md transition-opacity group-hover:opacity-100">
+                    {isGeneratingCare
+                      ? "Regenerating care info…"
+                      : "Regenerate AI-powered care info"}
+                  </span>
+                </span>
               </Form>
             </div>
             <div className="flex gap-1 border-b border-black/10 pb-0">
@@ -450,13 +457,20 @@ function PlantDetail({
               <Form method="post">
                 <input type="hidden" name="intent" value="generate_care_info" />
                 <input type="hidden" name="plant_id" value={plant.id} />
-                <button
-                  type="submit"
-                  disabled={isGeneratingCare}
-                  className="inline-flex items-center rounded-full bg-primary px-4 py-2 text-sm font-medium text-white transition hover:bg-primary-strong disabled:opacity-50"
-                >
-                  {isGeneratingCare ? "Generating…" : "Generate care info"}
-                </button>
+                <span className="group relative">
+                  <button
+                    type="submit"
+                    disabled={isGeneratingCare}
+                    className="inline-flex items-center rounded-full bg-primary px-4 py-2 text-sm font-medium text-white transition hover:bg-primary-strong disabled:pointer-events-none disabled:opacity-50"
+                  >
+                    {isGeneratingCare ? "Generating…" : "Generate care info"}
+                  </button>
+                  <span className="pointer-events-none absolute bottom-full left-1/2 mb-3 w-max max-w-[300px] -translate-x-1/2 rounded-lg border-green-200 bg-green-50 px-2.5 py-1.5 text-center text-[14px] leading-snug text-green-700 opacity-0 shadow-md transition-opacity group-hover:opacity-100">
+                    {isGeneratingCare
+                      ? "Generating care info…"
+                      : "Generate AI-powered care information based on your plant species and variety, and your garden's location."}
+                  </span>
+                </span>
               </Form>
             </div>
           </article>
