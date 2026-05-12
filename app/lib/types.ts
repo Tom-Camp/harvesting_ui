@@ -26,6 +26,7 @@ export type GardenMemberRole = "owner" | "member";
 export interface User {
   id: string;
   email: string;
+  username: string | null;
   first_name: string | null;
   last_name: string | null;
   picture: string | null;
@@ -122,6 +123,7 @@ export interface ApiError {
 export interface RegisterPayload {
   email: string;
   password: string;
+  username: string;
   first_name?: string;
   last_name?: string;
 }
@@ -179,6 +181,7 @@ export interface NoteUpdatePayload {
 }
 
 export interface UserUpdatePayload {
+  username?: string;
   first_name?: string;
   last_name?: string;
   picture?: string;

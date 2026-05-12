@@ -37,9 +37,11 @@ test.describe("Gardens", () => {
     await expect(page).toHaveURL(/\/gardens\//);
     await expect(page.getByRole("main").getByText(uniqueName)).toBeVisible();
 
-    // Cleanup: delete the garden we just created
+    // Cleanup: navigate to edit page and delete the garden
+    await page.getByRole("link", { name: "Edit garden" }).click();
+    await expect(page).toHaveURL(/\/edit/);
     page.once("dialog", (dialog) => dialog.accept());
-    await page.getByRole("button", { name: "Delete" }).click();
+    await page.getByRole("button", { name: "Delete garden" }).click();
     await expect(page).toHaveURL(/\/gardens$/);
   });
 

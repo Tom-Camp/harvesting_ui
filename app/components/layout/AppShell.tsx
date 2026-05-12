@@ -9,7 +9,7 @@ interface AppShellProps {
 export function AppShell({ user }: AppShellProps) {
   const displayName = user.first_name
     ? `${user.first_name}${user.last_name ? ` ${user.last_name}` : ""}`
-    : user.email;
+    : (user.username ?? user.email);
 
   return (
     <div className="min-h-screen bg-bg">
@@ -46,7 +46,16 @@ export function AppShell({ user }: AppShellProps) {
             </nav>
           </div>
           <div className="flex items-center gap-4">
-            <span className="text-sm text-text-muted">{displayName}</span>
+            <NavLink
+              to="/settings"
+              className={({ isActive }) =>
+                `text-sm transition-colors ${
+                  isActive ? "text-primary font-medium" : "text-text-muted hover:text-text-main"
+                }`
+              }
+            >
+              {displayName}
+            </NavLink>
             <Form method="post" action="/auth/logout">
               <button
                 type="submit"

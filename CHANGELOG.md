@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.2](https://github.com/Tom-Camp/harvesting_ui/compare/v0.2.1...v0.2.2) (2026-05-12)
+
+
+### Features
+
+* **Plant:** adding tool tip to generate ai button ([433fdaa](https://github.com/Tom-Camp/harvesting_ui/commit/433fdaaa0c2a022794437ff9589b1a3d43bcdb1a)), closes [#57](https://github.com/Tom-Camp/harvesting_ui/issues/57)
+* **PlantView:** sorting plots alphabetically ([11812d1](https://github.com/Tom-Camp/harvesting_ui/commit/11812d1a938157487f8191422d95c9b31a1451cd)), closes [#60](https://github.com/Tom-Camp/harvesting_ui/issues/60)
+* **search:** adding sidebar plant search ([e3b40b8](https://github.com/Tom-Camp/harvesting_ui/commit/e3b40b8ede498724bbe509d8ea2c8fdaa4e124a2)), closes [#59](https://github.com/Tom-Camp/harvesting_ui/issues/59)
+* **settings:** adding username to registration and settings ([6a0bbbc](https://github.com/Tom-Camp/harvesting_ui/commit/6a0bbbce7a20c42a4d12ea1fef4335c095571671)), closes [#70](https://github.com/Tom-Camp/harvesting_ui/issues/70)
+
 ### [0.2.1](https://github.com/Tom-Camp/harvesting_ui/compare/v0.2.0...v0.2.1) (2026-04-26)
 
 

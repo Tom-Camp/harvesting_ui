@@ -18,6 +18,7 @@ export default [
 
   // Authenticated routes
   layout("routes/_app.tsx", [
+    route("settings", "routes/_app.settings.tsx"),
     route("admin/users", "routes/_app.admin.users.tsx"),
     route("invitations/:token", "routes/_app.invitations.$token.tsx"),
     ...prefix("gardens", [

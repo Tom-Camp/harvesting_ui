@@ -29,6 +29,9 @@ type Pages = {
   "/auth/reset-password": {
     params: {};
   };
+  "/settings": {
+    params: {};
+  };
   "/admin/users": {
     params: {};
   };
@@ -69,7 +72,7 @@ type Pages = {
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/auth/login" | "/auth/register" | "/auth/logout" | "/auth/forgot-password" | "/auth/reset-password" | "/admin/users" | "/invitations/:token" | "/gardens" | "/gardens/new" | "/gardens/:gardenSlug" | "/gardens/:gardenSlug/edit" | "/gardens/:gardenSlug/members" | "/gardens/:gardenSlug/plants/:plantId";
+    page: "/" | "/auth/login" | "/auth/register" | "/auth/logout" | "/auth/forgot-password" | "/auth/reset-password" | "/settings" | "/admin/users" | "/invitations/:token" | "/gardens" | "/gardens/new" | "/gardens/:gardenSlug" | "/gardens/:gardenSlug/edit" | "/gardens/:gardenSlug/members" | "/gardens/:gardenSlug/plants/:plantId";
   };
   "routes/home.tsx": {
     id: "routes/home";
@@ -97,7 +100,11 @@ type RouteFiles = {
   };
   "routes/_app.tsx": {
     id: "routes/_app";
-    page: "/admin/users" | "/invitations/:token" | "/gardens" | "/gardens/new" | "/gardens/:gardenSlug" | "/gardens/:gardenSlug/edit" | "/gardens/:gardenSlug/members" | "/gardens/:gardenSlug/plants/:plantId";
+    page: "/settings" | "/admin/users" | "/invitations/:token" | "/gardens" | "/gardens/new" | "/gardens/:gardenSlug" | "/gardens/:gardenSlug/edit" | "/gardens/:gardenSlug/members" | "/gardens/:gardenSlug/plants/:plantId";
+  };
+  "routes/_app.settings.tsx": {
+    id: "routes/_app.settings";
+    page: "/settings";
   };
   "routes/_app.admin.users.tsx": {
     id: "routes/_app.admin.users";
@@ -146,6 +153,7 @@ type RouteModules = {
   "routes/auth.forgot-password": typeof import("./app/routes/auth.forgot-password.tsx");
   "routes/auth.reset-password": typeof import("./app/routes/auth.reset-password.tsx");
   "routes/_app": typeof import("./app/routes/_app.tsx");
+  "routes/_app.settings": typeof import("./app/routes/_app.settings.tsx");
   "routes/_app.admin.users": typeof import("./app/routes/_app.admin.users.tsx");
   "routes/_app.invitations.$token": typeof import("./app/routes/_app.invitations.$token.tsx");
   "routes/_app.gardens": typeof import("./app/routes/_app.gardens.tsx");
