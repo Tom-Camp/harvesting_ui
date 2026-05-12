@@ -3,6 +3,7 @@ import { AuthShell } from "~/components/layout/AuthShell";
 import { Button } from "~/components/ui/Button";
 import { FormError } from "~/components/ui/FormError";
 import { Input } from "~/components/ui/Input";
+import { PasswordInput } from "~/components/ui/PasswordInput";
 import { registerUser } from "~/.server/api";
 import { ApiClientError } from "~/lib/api-client";
 import { createUserSession, getToken } from "~/.server/session";
@@ -22,12 +23,16 @@ export async function action({ request }: Route.ActionArgs) {
   const form = await request.formData();
   const email = String(form.get("email") ?? "");
   const password = String(form.get("password") ?? "");
+  const confirm_password = String(form.get("confirm_password") ?? "");
   const username = String(form.get("username") ?? "");
   const first_name = String(form.get("first_name") ?? "") || undefined;
   const last_name = String(form.get("last_name") ?? "") || undefined;
 
   if (!email || !password || !username) {
     return { error: "Username, email, and password are required." };
+  }
+  if (password !== confirm_password) {
+    return { error: "Passwords do not match." };
   }
 
   try {
@@ -82,10 +87,15 @@ export default function Register() {
           autoComplete="email"
           required
         />
-        <Input
+        <PasswordInput
           label="Password"
           name="password"
-          type="password"
+          autoComplete="new-password"
+          required
+        />
+        <PasswordInput
+          label="Confirm password"
+          name="confirm_password"
           autoComplete="new-password"
           required
         />

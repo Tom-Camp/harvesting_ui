@@ -4,7 +4,7 @@ import zxcvbn from "zxcvbn";
 import { AuthShell } from "~/components/layout/AuthShell";
 import { Button } from "~/components/ui/Button";
 import { FormError } from "~/components/ui/FormError";
-import { Input } from "~/components/ui/Input";
+import { PasswordInput } from "~/components/ui/PasswordInput";
 import { resetPassword } from "~/.server/api";
 import { ApiClientError } from "~/lib/api-client";
 import type { Route } from "./+types/auth.reset-password";
@@ -84,10 +84,9 @@ export default function ResetPassword({ loaderData }: Route.ComponentProps) {
           <input type="hidden" name="token" value={token} />
           <FormError message={actionData?.error ?? undefined} />
           <div className="flex flex-col gap-2">
-            <Input
+            <PasswordInput
               label="New password"
               name="new_password"
-              type="password"
               autoComplete="new-password"
               required
               onChange={handlePasswordChange}
@@ -108,10 +107,9 @@ export default function ResetPassword({ loaderData }: Route.ComponentProps) {
               </div>
             )}
           </div>
-          <Input
+          <PasswordInput
             label="Confirm password"
             name="confirm_password"
-            type="password"
             autoComplete="new-password"
             required
           />
