@@ -22,17 +22,19 @@ export async function action({ request }: Route.ActionArgs) {
   const form = await request.formData();
   const email = String(form.get("email") ?? "");
   const password = String(form.get("password") ?? "");
+  const username = String(form.get("username") ?? "");
   const first_name = String(form.get("first_name") ?? "") || undefined;
   const last_name = String(form.get("last_name") ?? "") || undefined;
 
-  if (!email || !password) {
-    return { error: "Email and password are required." };
+  if (!email || !password || !username) {
+    return { error: "Username, email, and password are required." };
   }
 
   try {
     const { access_token } = await registerUser({
       email,
       password,
+      username,
       first_name,
       last_name,
     });
@@ -54,6 +56,13 @@ export default function Register() {
     <AuthShell title="Create your account">
       <Form method="post" className="flex flex-col gap-5">
         <FormError message={actionData?.error} />
+        <Input
+          label="Username"
+          name="username"
+          type="text"
+          autoComplete="username"
+          required
+        />
         <Input
           label="First name"
           name="first_name"
