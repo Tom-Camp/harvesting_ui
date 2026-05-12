@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Form, Link, useActionData, useLoaderData } from "react-router";
 import { getGarden, getMe, inviteMember, listMembers, removeMember } from "~/.server/api";
 import { ApiClientError } from "~/lib/api-client";
@@ -27,21 +26,19 @@ export async function action({ request, params }: Route.ActionArgs) {
 
   if (intent === "invite") {
     const email = String(form.get("email") ?? "").trim();
-    if (!email) return { error: "Email is required.", inviteUrl: null };
+    if (!email) return { error: "Email is required.", invitedEmail: null };
     try {
       const [me, members] = await Promise.all([
         getMe(token),
         listMembers(token, params.gardenSlug),
       ]);
       const isOwner = members.some((m) => m.user_id === me.id && m.role === "owner");
-      if (!isOwner) return { error: "Only garden owners can invite members.", inviteUrl: null };
+      if (!isOwner) return { error: "Only garden owners can invite members.", invitedEmail: null };
       const invitation = await inviteMember(token, params.gardenSlug, email);
-      const origin = new URL(request.url).origin;
-      const inviteUrl = `${origin}/invitations/${invitation.token}`;
-      return { error: null, inviteUrl };
+      return { error: null, invitedEmail: invitation.invited_email };
     } catch (err) {
-      if (err instanceof ApiClientError) return { error: err.message, inviteUrl: null };
-      return { error: "Failed to send invitation.", inviteUrl: null };
+      if (err instanceof ApiClientError) return { error: err.message, invitedEmail: null };
+      return { error: "Failed to send invitation.", invitedEmail: null };
     }
   }
 
@@ -49,14 +46,14 @@ export async function action({ request, params }: Route.ActionArgs) {
     const userId = String(form.get("user_id") ?? "");
     try {
       await removeMember(token, params.gardenSlug, userId);
-      return { error: null, inviteUrl: null };
+      return { error: null, invitedEmail: null };
     } catch (err) {
-      if (err instanceof ApiClientError) return { error: err.message, inviteUrl: null };
-      return { error: "Failed to remove member.", inviteUrl: null };
+      if (err instanceof ApiClientError) return { error: err.message, invitedEmail: null };
+      return { error: "Failed to remove member.", invitedEmail: null };
     }
   }
 
-  return { error: "Unknown action.", inviteUrl: null };
+  return { error: "Unknown action.", invitedEmail: null };
 }
 
 const ROLE_LABELS: Record<GardenMemberRole, string> = {
@@ -72,17 +69,9 @@ const ROLE_CLASSES: Record<GardenMemberRole, string> = {
 export default function GardenMembers() {
   const { garden, members, currentUserId } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
-  const [copied, setCopied] = useState(false);
 
   const currentMember = members.find((m) => m.user_id === currentUserId);
   const isOwner = currentMember?.role === "owner";
-
-  async function copyInviteUrl() {
-    if (!actionData?.inviteUrl) return;
-    await navigator.clipboard.writeText(actionData.inviteUrl);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  }
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
@@ -113,28 +102,10 @@ export default function GardenMembers() {
         </div>
       )}
 
-      {/* Invite link result */}
-      {actionData?.inviteUrl && (
-        <div className="mb-6 rounded-3xl border border-black/10 bg-surface p-5 shadow-soft sm:p-6">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-text-muted">
-            Invitation link
-          </p>
-          <p className="mb-3 text-sm text-text-faint">
-            Share this link with the person you invited. It expires after 7 days.
-          </p>
-          <div className="flex items-center gap-2">
-            <input
-              readOnly
-              value={actionData.inviteUrl}
-              className="min-w-0 flex-1 rounded-xl border border-black/10 bg-bg px-3 py-2 text-sm text-text-main"
-            />
-            <button
-              onClick={copyInviteUrl}
-              className="inline-flex items-center rounded-full bg-primary px-4 py-2 text-xs font-medium text-white transition hover:bg-primary-strong"
-            >
-              {copied ? "Copied!" : "Copy"}
-            </button>
-          </div>
+      {/* Invite success */}
+      {actionData?.invitedEmail && (
+        <div className="mb-6 rounded-2xl border border-green-200/60 bg-green-50 px-4 py-3 text-sm text-green-800">
+          Invitation sent to <span className="font-medium">{actionData.invitedEmail}</span>.
         </div>
       )}
 
