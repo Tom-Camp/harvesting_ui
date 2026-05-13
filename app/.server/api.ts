@@ -271,6 +271,10 @@ export async function listAdminUsers(token: string): Promise<User[]> {
   return client(token).get<User[]>("/admin/users");
 }
 
+export async function listAdminGardens(token: string): Promise<Garden[]> {
+  return client(token).get<Garden[]>("/admin/gardens");
+}
+
 export async function approveUsers(token: string, userId: string): Promise<User> {
   return client(token).patch<User>(`/admin/users/${userId}/approve`, {});
 }

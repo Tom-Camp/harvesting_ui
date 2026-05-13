@@ -20,6 +20,7 @@ export default [
   layout("routes/_app.tsx", [
     route("settings", "routes/_app.settings.tsx"),
     route("admin/users", "routes/_app.admin.users.tsx"),
+    route("admin/gardens", "routes/_app.admin.gardens.tsx"),
     route("invitations/:token", "routes/_app.invitations.$token.tsx"),
     ...prefix("gardens", [
       index("routes/_app.gardens.tsx"),
