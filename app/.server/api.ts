@@ -1,6 +1,8 @@
 import { redirect } from "react-router";
 import { ApiClientError, createApiClient } from "~/lib/api-client";
 import type {
+  AdminInvitation,
+  AdminInvitationPayload,
   CareInfo,
   ForgotPasswordPayload,
   Garden,
@@ -292,7 +294,7 @@ export async function setUserRole(
   return client(token).patch<User>(`/admin/users/${userId}/role`, payload);
 }
 
-// Invitations
+// Garden invitations
 export async function acceptInvitation(
   token: string,
   invitationToken: string
@@ -300,4 +302,18 @@ export async function acceptInvitation(
   return client(token).post<GardenMember>(
     `/invitations/${invitationToken}/accept`
   );
+}
+
+// Admin invitations
+export async function sendAdminInvitation(
+  token: string,
+  payload: AdminInvitationPayload
+): Promise<AdminInvitation> {
+  return client(token).post<AdminInvitation>("/admin/invitations", payload);
+}
+
+export async function listAdminInvitations(
+  token: string
+): Promise<AdminInvitation[]> {
+  return client(token).get<AdminInvitation[]>("/admin/invitations");
 }
