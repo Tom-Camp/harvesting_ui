@@ -1,18 +1,14 @@
-import { Link, redirect, useLoaderData } from "react-router";
-import { listAdminGardens, getMe } from "~/.server/api";
+import { Link, useLoaderData } from "react-router";
+import { listAdminGardens } from "~/.server/api";
 import { requireToken } from "~/.server/session";
 import type { Route } from "./+types/_app.admin.gardens";
 
 export function meta() {
-  return [{ title: "Garden Administration — harvesting.food" }];
+  return [{ title: "Gardens — harvesting.food Admin" }];
 }
 
 export async function loader({ request }: Route.LoaderArgs) {
   const token = await requireToken(request);
-  const currentUser = await getMe(token);
-  if (currentUser.role !== "admin") {
-    throw redirect("/gardens");
-  }
   const gardens = await listAdminGardens(token);
   return { gardens };
 }

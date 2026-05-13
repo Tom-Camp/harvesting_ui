@@ -32,28 +32,17 @@ export function AppShell({ user }: AppShellProps) {
                 My Gardens
               </NavLink>
               {user.role === "admin" && (
-                <>
-                  <NavLink
-                    to="/admin/users"
-                    className={({ isActive }) =>
-                      `text-sm font-medium transition-colors ${
-                        isActive ? "text-primary" : "text-text-muted hover:text-text-main"
-                      }`
-                    }
-                  >
-                    All Users
-                  </NavLink>
-                  <NavLink
-                    to="/admin/gardens"
-                    className={({ isActive }) =>
-                      `text-sm font-medium transition-colors ${
-                        isActive ? "text-primary" : "text-text-muted hover:text-text-main"
-                      }`
-                    }
-                  >
-                    All Gardens
-                  </NavLink>
-                </>
+                <NavLink
+                  to="/admin"
+                  end={false}
+                  className={({ isActive }) =>
+                    `text-sm font-medium transition-colors ${
+                      isActive ? "text-orange" : "text-text-muted hover:text-text-main"
+                    }`
+                  }
+                >
+                  Admin
+                </NavLink>
               )}
             </nav>
           </div>

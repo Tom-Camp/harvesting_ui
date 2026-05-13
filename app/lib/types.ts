@@ -120,12 +120,26 @@ export interface ApiError {
 }
 
 // Request payload types
+export interface AdminInvitation {
+  id: string;
+  email: string;
+  token: string;
+  accepted_at: string | null;
+  created_at: string;
+  expires_at: string;
+}
+
+export interface AdminInvitationPayload {
+  email: string;
+}
+
 export interface RegisterPayload {
   email: string;
   password: string;
   username: string;
   first_name?: string;
   last_name?: string;
+  invitation_token?: string;
 }
 
 export interface LoginPayload {

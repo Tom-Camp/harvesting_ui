@@ -1,22 +1,18 @@
-import { redirect, useActionData, useLoaderData } from "react-router";
-import { approveUsers, listAdminUsers, setUserRole, suspendUsers } from "~/.server/api";
+import { useActionData, useLoaderData } from "react-router";
+import { approveUsers, getMe, listAdminUsers, setUserRole, suspendUsers } from "~/.server/api";
 import { requireToken } from "~/.server/session";
 import { ApiClientError } from "~/lib/api-client";
-import { getMe } from "~/.server/api";
 import { Button } from "~/components/ui/Button";
 import type { UserRole, UserStatus } from "~/lib/types";
 import type { Route } from "./+types/_app.admin.users";
 
 export function meta() {
-  return [{ title: "User Administration — harvesting.food" }];
+  return [{ title: "Users — harvesting.food Admin" }];
 }
 
 export async function loader({ request }: Route.LoaderArgs) {
   const token = await requireToken(request);
   const currentUser = await getMe(token);
-  if (currentUser.role !== "admin") {
-    throw redirect("/gardens");
-  }
   const users = await listAdminUsers(token);
   return { users, currentUserId: currentUser.id };
 }
