@@ -67,7 +67,7 @@ export function GardenForm({
       </div>
       <div className="flex flex-col gap-1">
         <label htmlFor="notes" className="text-sm font-medium text-gray-700">
-          Notes
+          Description
         </label>
         <textarea
           id="notes"
