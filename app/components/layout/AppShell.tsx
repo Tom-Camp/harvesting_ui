@@ -33,14 +33,15 @@ export function AppShell({ user }: AppShellProps) {
               </NavLink>
               {user.role === "admin" && (
                 <NavLink
-                  to="/admin/users"
+                  to="/admin"
+                  end={false}
                   className={({ isActive }) =>
                     `text-sm font-medium transition-colors ${
-                      isActive ? "text-primary" : "text-text-muted hover:text-text-main"
+                      isActive ? "text-orange" : "text-text-muted hover:text-text-main"
                     }`
                   }
                 >
-                  Users
+                  Admin
                 </NavLink>
               )}
             </nav>

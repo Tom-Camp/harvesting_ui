@@ -1,8 +1,9 @@
-import { Form, Link, redirect, useActionData, useNavigation } from "react-router";
+import { Form, Link, redirect, useActionData, useLoaderData, useNavigation } from "react-router";
 import { AuthShell } from "~/components/layout/AuthShell";
 import { Button } from "~/components/ui/Button";
 import { FormError } from "~/components/ui/FormError";
 import { Input } from "~/components/ui/Input";
+import { PasswordInput } from "~/components/ui/PasswordInput";
 import { registerUser } from "~/.server/api";
 import { ApiClientError } from "~/lib/api-client";
 import { createUserSession, getToken } from "~/.server/session";
@@ -15,19 +16,26 @@ export function meta() {
 export async function loader({ request }: Route.LoaderArgs) {
   const token = await getToken(request);
   if (token) throw redirect("/gardens");
-  return null;
+  const url = new URL(request.url);
+  const invitationToken = url.searchParams.get("token");
+  return { invitationToken };
 }
 
 export async function action({ request }: Route.ActionArgs) {
   const form = await request.formData();
   const email = String(form.get("email") ?? "");
   const password = String(form.get("password") ?? "");
+  const confirm_password = String(form.get("confirm_password") ?? "");
   const username = String(form.get("username") ?? "");
   const first_name = String(form.get("first_name") ?? "") || undefined;
   const last_name = String(form.get("last_name") ?? "") || undefined;
+  const invitation_token = String(form.get("invitation_token") ?? "") || undefined;
 
   if (!email || !password || !username) {
     return { error: "Username, email, and password are required." };
+  }
+  if (password !== confirm_password) {
+    return { error: "Passwords do not match." };
   }
 
   try {
@@ -37,6 +45,7 @@ export async function action({ request }: Route.ActionArgs) {
       username,
       first_name,
       last_name,
+      invitation_token,
     });
     return createUserSession(access_token, "", "/gardens");
   } catch (err) {
@@ -48,13 +57,22 @@ export async function action({ request }: Route.ActionArgs) {
 }
 
 export default function Register() {
+  const { invitationToken } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
 
   return (
     <AuthShell title="Create your account">
+      {invitationToken && (
+        <p className="mb-4 rounded-md bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-800">
+          You&apos;ve been invited! Register below to get started.
+        </p>
+      )}
       <Form method="post" className="flex flex-col gap-5">
+        {invitationToken && (
+          <input type="hidden" name="invitation_token" value={invitationToken} />
+        )}
         <FormError message={actionData?.error} />
         <Input
           label="Username"
@@ -82,10 +100,15 @@ export default function Register() {
           autoComplete="email"
           required
         />
-        <Input
+        <PasswordInput
           label="Password"
           name="password"
-          type="password"
+          autoComplete="new-password"
+          required
+        />
+        <PasswordInput
+          label="Confirm password"
+          name="confirm_password"
           autoComplete="new-password"
           required
         />

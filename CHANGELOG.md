@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.3](https://github.com/Tom-Camp/harvesting_ui/compare/v0.2.2...v0.2.3) (2026-05-14)
+
+
+### Features
+
+* **admin:** adding admin section and user invite ([9495151](https://github.com/Tom-Camp/harvesting_ui/commit/9495151158b8c02267e70ba55378474fe9d088ad)), closes [#69](https://github.com/Tom-Camp/harvesting_ui/issues/69)
+* **admin:** adding admin views for users and gardens ([02420a6](https://github.com/Tom-Camp/harvesting_ui/commit/02420a601fcd3a86d0f555bfa096117f0401a365)), closes [#77](https://github.com/Tom-Camp/harvesting_ui/issues/77)
+* **garden:** changing garden note to description ([d5a1972](https://github.com/Tom-Camp/harvesting_ui/commit/d5a1972bb7c6d46bc2b3184cc1f6ee894cf4ddc8)), closes [#64](https://github.com/Tom-Camp/harvesting_ui/issues/64)
+* **members:** changed member invite to send email ([e8770c4](https://github.com/Tom-Camp/harvesting_ui/commit/e8770c41914c3eae3816f1c764619589ae5e28fe)), closes [#56](https://github.com/Tom-Camp/harvesting_ui/issues/56)
+* **PasswordInput:** added password confirmation field ([e5ba189](https://github.com/Tom-Camp/harvesting_ui/commit/e5ba189406a72307acca0efe6602171510985209)), closes [#68](https://github.com/Tom-Camp/harvesting_ui/issues/68)
+
 ### [0.2.2](https://github.com/Tom-Camp/harvesting_ui/compare/v0.2.1...v0.2.2) (2026-05-12)
 
 
