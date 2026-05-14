@@ -536,6 +536,17 @@ function GardenDashboardView({
 
   return (
     <>
+      {garden.notes && (
+        <section className="mb-6">
+          <article className="rounded-3xl border border-black/10 bg-surface p-5 shadow-soft sm:p-6">
+            <div className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-text-muted">
+              Description
+            </div>
+            <p className="text-sm leading-7 text-text-main">{garden.notes}</p>
+          </article>
+        </section>
+      )}
+
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         <PlantKPICard
           label="Garden Age"
