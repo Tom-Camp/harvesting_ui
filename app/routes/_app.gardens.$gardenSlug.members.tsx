@@ -26,19 +26,13 @@ export async function action({ request, params }: Route.ActionArgs) {
 
   if (intent === "invite") {
     const email = String(form.get("email") ?? "").trim();
-    if (!email) return { error: "Email is required.", invitedEmail: null };
+    if (!email) return { error: "Email is required.", invitation: null };
     try {
-      const [me, members] = await Promise.all([
-        getMe(token),
-        listMembers(token, params.gardenSlug),
-      ]);
-      const isOwner = members.some((m) => m.user_id === me.id && m.role === "owner");
-      if (!isOwner) return { error: "Only garden owners can invite members.", invitedEmail: null };
       const invitation = await inviteMember(token, params.gardenSlug, email);
-      return { error: null, invitedEmail: invitation.invited_email };
+      return { error: null, invitation };
     } catch (err) {
-      if (err instanceof ApiClientError) return { error: err.message, invitedEmail: null };
-      return { error: "Failed to send invitation.", invitedEmail: null };
+      if (err instanceof ApiClientError) return { error: err.message, invitation: null };
+      return { error: "Failed to send invitation.", invitation: null };
     }
   }
 
@@ -46,14 +40,14 @@ export async function action({ request, params }: Route.ActionArgs) {
     const userId = String(form.get("user_id") ?? "");
     try {
       await removeMember(token, params.gardenSlug, userId);
-      return { error: null, invitedEmail: null };
+      return { error: null, invitation: null };
     } catch (err) {
-      if (err instanceof ApiClientError) return { error: err.message, invitedEmail: null };
-      return { error: "Failed to remove member.", invitedEmail: null };
+      if (err instanceof ApiClientError) return { error: err.message, invitation: null };
+      return { error: "Failed to remove member.", invitation: null };
     }
   }
 
-  return { error: "Unknown action.", invitedEmail: null };
+  return { error: "Unknown action.", invitation: null };
 }
 
 const ROLE_LABELS: Record<GardenMemberRole, string> = {
@@ -103,9 +97,10 @@ export default function GardenMembers() {
       )}
 
       {/* Invite success */}
-      {actionData?.invitedEmail && (
+      {actionData?.invitation && (
         <div className="mb-6 rounded-2xl border border-green-200/60 bg-green-50 px-4 py-3 text-sm text-green-800">
-          Invitation sent to <span className="font-medium">{actionData.invitedEmail}</span>.
+          An invitation email has been sent to{" "}
+          <span className="font-medium">{actionData.invitation.invited_email}</span>.
         </div>
       )}
 
