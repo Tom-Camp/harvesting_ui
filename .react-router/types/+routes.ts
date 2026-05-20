@@ -14,6 +14,9 @@ type Pages = {
   "/": {
     params: {};
   };
+  "/register": {
+    params: {};
+  };
   "/auth/login": {
     params: {};
   };
@@ -81,11 +84,15 @@ type Pages = {
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/auth/login" | "/auth/register" | "/auth/logout" | "/auth/forgot-password" | "/auth/reset-password" | "/settings" | "/admin" | "/admin/users" | "/admin/gardens" | "/admin/invitations" | "/invitations/:token" | "/gardens" | "/gardens/new" | "/gardens/:gardenSlug" | "/gardens/:gardenSlug/edit" | "/gardens/:gardenSlug/members" | "/gardens/:gardenSlug/plants/:plantId";
+    page: "/" | "/register" | "/auth/login" | "/auth/register" | "/auth/logout" | "/auth/forgot-password" | "/auth/reset-password" | "/settings" | "/admin" | "/admin/users" | "/admin/gardens" | "/admin/invitations" | "/invitations/:token" | "/gardens" | "/gardens/new" | "/gardens/:gardenSlug" | "/gardens/:gardenSlug/edit" | "/gardens/:gardenSlug/members" | "/gardens/:gardenSlug/plants/:plantId";
   };
   "routes/home.tsx": {
     id: "routes/home";
     page: "/";
+  };
+  "routes/register-redirect.tsx": {
+    id: "routes/register-redirect";
+    page: "/register";
   };
   "routes/auth.login.tsx": {
     id: "routes/auth.login";
@@ -172,6 +179,7 @@ type RouteFiles = {
 type RouteModules = {
   "root": typeof import("./app/root.tsx");
   "routes/home": typeof import("./app/routes/home.tsx");
+  "routes/register-redirect": typeof import("./app/routes/register-redirect.tsx");
   "routes/auth.login": typeof import("./app/routes/auth.login.tsx");
   "routes/auth.register": typeof import("./app/routes/auth.register.tsx");
   "routes/auth.logout": typeof import("./app/routes/auth.logout.tsx");

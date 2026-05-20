@@ -1,6 +1,9 @@
 import { test, expect } from "@playwright/test";
 import { login } from "./helpers/auth";
 
+const plantButtonLocator = (page: import("@playwright/test").Page) =>
+  page.locator("aside button").filter({ has: page.locator('span[style*="background-color"]') });
+
 async function getFirstGardenWithPlant(page: import("@playwright/test").Page) {
   await login(page);
   await page.goto("/gardens");
@@ -9,17 +12,18 @@ async function getFirstGardenWithPlant(page: import("@playwright/test").Page) {
   if (count === 0) return null;
   const href = await cards.first().getAttribute("href");
   await page.goto(href!);
-  const hasPlants = !(await page.getByText("No plants in this garden yet").isVisible().catch(() => false));
-  return hasPlants ? href : null;
+  // Wait for the sidebar to settle into either state before checking
+  await Promise.race([
+    plantButtonLocator(page).first().waitFor({ timeout: 5000 }),
+    page.getByText("No plants yet.").waitFor({ timeout: 5000 }),
+  ]).catch(() => {});
+  const plantCount = await plantButtonLocator(page).count();
+  return plantCount > 0 ? href : null;
 }
 
 // Select the first plant in the sidebar (desktop viewport required)
 async function selectFirstPlant(page: import("@playwright/test").Page) {
-  await page
-    .locator("aside button")
-    .filter({ has: page.locator('span[style*="background-color"]') })
-    .first()
-    .click();
+  await plantButtonLocator(page).first().click();
 }
 
 test.describe("Garden Dashboard", () => {
@@ -118,7 +122,12 @@ test.describe("Garden Dashboard", () => {
     }
     const href = await cards.first().getAttribute("href");
     await page.goto(href!);
-    const sidebarItems = page.locator('aside button').filter({ has: page.locator('span[style*="background-color"]') });
+    // Wait for sidebar to settle
+    await Promise.race([
+      plantButtonLocator(page).first().waitFor({ timeout: 5000 }),
+      page.getByText("No plants yet.").waitFor({ timeout: 5000 }),
+    ]).catch(() => {});
+    const sidebarItems = plantButtonLocator(page);
     const count = await sidebarItems.count();
     if (count < 2) {
       test.skip();

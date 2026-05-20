@@ -118,9 +118,6 @@ export default function AdminInvitations() {
                     Email
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">
-                    Sent
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">
                     Expires
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">
@@ -133,10 +130,7 @@ export default function AdminInvitations() {
                   const status = invitationStatus(inv);
                   return (
                     <tr key={inv.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 text-sm text-gray-900">{inv.email}</td>
-                      <td className="px-6 py-4 text-sm text-gray-500">
-                        {new Date(inv.created_at).toLocaleDateString()}
-                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-900">{inv.invited_email}</td>
                       <td className="px-6 py-4 text-sm text-gray-500">
                         {new Date(inv.expires_at).toLocaleDateString()}
                       </td>
@@ -152,7 +146,7 @@ export default function AdminInvitations() {
                 })}
                 {invitations.length === 0 && (
                   <tr>
-                    <td colSpan={4} className="px-6 py-12 text-center text-sm text-gray-500">
+                    <td colSpan={3} className="px-6 py-12 text-center text-sm text-gray-500">
                       No invitations sent yet.
                     </td>
                   </tr>
