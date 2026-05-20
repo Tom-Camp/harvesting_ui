@@ -78,7 +78,7 @@ test.describe("Plants", () => {
     }
     // Either we see the sidebar with plants or the empty state
     const hasPlants = await page.locator('[class*="sidebar"], nav').isVisible().catch(() => false);
-    const hasEmpty = await page.getByText("No plants in this garden yet").isVisible().catch(() => false);
+    const hasEmpty = await page.getByText("No plants yet").isVisible().catch(() => false);
     expect(hasPlants || hasEmpty).toBe(true);
   });
 

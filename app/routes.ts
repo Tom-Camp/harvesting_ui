@@ -9,6 +9,9 @@ import {
 export default [
   index("routes/home.tsx"),
 
+  // Redirect /register?token=... → /auth/register?token=... (backend email links)
+  route("register", "routes/register-redirect.tsx"),
+
   // Auth (no app shell)
   route("auth/login", "routes/auth.login.tsx"),
   route("auth/register", "routes/auth.register.tsx"),
