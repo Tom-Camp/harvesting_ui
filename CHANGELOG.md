@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.4](https://github.com/Tom-Camp/harvesting_ui/compare/v0.2.3...v0.2.4) (2026-05-20)
+
+
+### Bug Fixes
+
+* **invitations:** fixing the 404 for invitations ([7976eb5](https://github.com/Tom-Camp/harvesting_ui/commit/7976eb542ce18a8f0ea429118213373302b0957f)), closes [#85](https://github.com/Tom-Camp/harvesting_ui/issues/85)
+
 ### [0.2.3](https://github.com/Tom-Camp/harvesting_ui/compare/v0.2.2...v0.2.3) (2026-05-14)
 
 
