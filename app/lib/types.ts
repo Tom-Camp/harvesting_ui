@@ -122,10 +122,9 @@ export interface ApiError {
 // Request payload types
 export interface AdminInvitation {
   id: string;
-  email: string;
-  token: string;
+  invited_email: string;
+  invited_by_user_id: string;
   accepted_at: string | null;
-  created_at: string;
   expires_at: string;
 }
 
