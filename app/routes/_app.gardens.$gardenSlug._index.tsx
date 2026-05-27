@@ -36,7 +36,7 @@ import { NoteModal } from "~/components/plants/NoteModal";
 import type { NoteModalState } from "~/components/plants/NoteModal";
 import { HarvestModal } from "~/components/plants/HarvestModal";
 import type { HarvestModalState } from "~/components/plants/HarvestModal";
-import { Calendar, ChartNoAxesCombined, Leaf, Sprout, TrendingUp, Wheat } from "lucide-react";
+import { Calendar, ChartNoAxesCombined, ChevronDown, LayoutDashboard, Leaf, Search, Sprout, TrendingUp, Wheat } from "lucide-react";
 import { ProgressRing } from "~/components/ProgressRing";
 import { HarvestTrend } from "~/components/HarvestTrend";
 
@@ -619,6 +619,116 @@ function GardenDashboardView({
   );
 }
 
+function MobilePlantPicker({
+  plants,
+  selectedId,
+  onSelect,
+}: {
+  plants: Plant[];
+  selectedId: string | null;
+  onSelect: (id: string | null) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
+
+  const selectedPlant = plants.find((p) => p.id === selectedId) ?? null;
+  const label = selectedPlant
+    ? [selectedPlant.species, selectedPlant.variety].filter(Boolean).join(" ")
+    : "Dashboard";
+
+  const needle = query.trim().toLowerCase();
+  const filtered = needle
+    ? plants.filter(
+        (p) =>
+          p.species.toLowerCase().includes(needle) ||
+          (p.variety ?? "").toLowerCase().includes(needle)
+      )
+    : plants;
+
+  const close = () => { setOpen(false); setQuery(""); };
+  const handleSelect = (id: string | null) => { onSelect(id); close(); };
+
+  return (
+    <div className="lg:hidden border-b border-black/10 px-4 py-3">
+      <div className="relative">
+        {open && (
+          <div className="fixed inset-0 z-20" onClick={close} />
+        )}
+        <button
+          type="button"
+          onClick={() => setOpen((o) => !o)}
+          className="flex w-full items-center justify-between rounded-xl border border-black/10 bg-surface px-4 py-2.5 text-sm text-text-main transition hover:bg-surface-offset"
+        >
+          <span className="capitalize">{label}</span>
+          <ChevronDown className={`h-4 w-4 shrink-0 text-text-faint transition-transform ${open ? "rotate-180" : ""}`} />
+        </button>
+        {open && (
+          <div className="absolute left-0 right-0 top-full z-30 mt-1 overflow-hidden rounded-xl border border-black/10 bg-surface shadow-lg">
+            <div className="p-2">
+              <div className="relative">
+                <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-text-faint" />
+                <input
+                  type="search"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Search plants…"
+                  autoFocus
+                  className="w-full rounded-lg border border-black/10 bg-bg py-2 pl-8 pr-3 text-sm text-text-main placeholder:text-text-faint focus:outline-none focus:ring-1 focus:ring-primary/40"
+                />
+              </div>
+            </div>
+            <div className="max-h-64 overflow-y-auto pb-2">
+              {!needle && (
+                <button
+                  type="button"
+                  onClick={() => handleSelect(null)}
+                  className={[
+                    "flex w-full items-center gap-2.5 px-4 py-2.5 text-sm transition",
+                    selectedId === null
+                      ? "bg-primary-soft font-medium text-primary"
+                      : "text-text-muted hover:bg-surface-offset hover:text-text-main",
+                  ].join(" ")}
+                >
+                  <LayoutDashboard className="h-3.5 w-3.5 shrink-0" />
+                  Dashboard
+                </button>
+              )}
+              {filtered.length === 0 ? (
+                <p className="px-4 py-3 text-sm text-text-faint">No plants match.</p>
+              ) : (
+                filtered.map((plant) => (
+                  <button
+                    type="button"
+                    key={plant.id}
+                    onClick={() => handleSelect(plant.id)}
+                    className={[
+                      "flex w-full items-center gap-2.5 px-4 py-2.5 text-sm transition",
+                      selectedId === plant.id
+                        ? "bg-primary-soft font-medium text-primary"
+                        : "text-text-muted hover:bg-surface-offset hover:text-text-main",
+                    ].join(" ")}
+                  >
+                    <span
+                      className="h-2 w-2 shrink-0 rounded-full"
+                      style={{ backgroundColor: plantTypeColors[plant.plant_type] }}
+                    />
+                    <span className="capitalize">
+                      {plant.species}
+                      {plant.variety && (
+                        <em className="ml-1 not-italic text-text-faint capitalize">{plant.variety}</em>
+                      )}
+                    </span>
+                  </button>
+                ))
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function GardenDashboard() {
   const { garden, plants } = useOutletContext<GardenOutletContext>();
   const [searchParams] = useSearchParams();
@@ -649,36 +759,11 @@ export default function GardenDashboard() {
       />
 
       <div className="min-w-0 flex-1">
-        {/* Mobile: horizontal tab bar */}
-        <div className="border-b border-black/10 px-4 py-3 lg:hidden">
-          <div className="flex gap-2 overflow-x-auto pb-1">
-            <button
-              onClick={() => setSelectedId(null)}
-              className={[
-                "whitespace-nowrap rounded-full border px-3 py-1.5 text-sm transition",
-                effectiveSelectedId === null
-                  ? "border-transparent bg-primary-soft text-primary"
-                  : "border-black/10 bg-surface text-text-muted",
-              ].join(" ")}
-            >
-              Dashboard
-            </button>
-            {plants.map((plant) => (
-              <button
-                key={plant.id}
-                onClick={() => setSelectedId(plant.id)}
-                className={[
-                  "whitespace-nowrap rounded-full border px-3 py-1.5 text-sm transition",
-                  effectiveSelectedId === plant.id
-                    ? "border-transparent bg-primary-soft text-primary"
-                    : "border-black/10 bg-surface text-text-muted",
-                ].join(" ")}
-              >
-                {plant.species}
-              </button>
-            ))}
-          </div>
-        </div>
+        <MobilePlantPicker
+          plants={plants}
+          selectedId={effectiveSelectedId}
+          onSelect={setSelectedId}
+        />
 
         <main className="w-full max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
           {/* Garden header with actions */}

@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.5](https://github.com/Tom-Camp/harvesting_ui/compare/v0.2.4...v0.2.5) (2026-05-27)
+
+
+### Features
+
+* **feedback:** adding feedback form ([60e1874](https://github.com/Tom-Camp/harvesting_ui/commit/60e18747ca7ac503779d8e67ea0448c8ca691b4d)), closes [#91](https://github.com/Tom-Camp/harvesting_ui/issues/91)
+
 ### [0.2.4](https://github.com/Tom-Camp/harvesting_ui/compare/v0.2.3...v0.2.4) (2026-05-20)
 
 

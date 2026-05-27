@@ -212,3 +212,11 @@ export interface ResetPasswordPayload {
   token: string;
   new_password: string;
 }
+
+export type FeedbackType = "bug" | "enhancement";
+
+export interface FeedbackPayload {
+  type: FeedbackType;
+  title: string;
+  description: string;
+}

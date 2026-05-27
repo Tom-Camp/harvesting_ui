@@ -22,6 +22,7 @@ export default [
   // Authenticated routes
   layout("routes/_app.tsx", [
     route("settings", "routes/_app.settings.tsx"),
+    route("feedback", "routes/_app.feedback.tsx"),
     ...prefix("admin", [
       layout("routes/_app.admin.tsx", [
         index("routes/_app.admin._index.tsx"),
