@@ -35,6 +35,9 @@ type Pages = {
   "/settings": {
     params: {};
   };
+  "/feedback": {
+    params: {};
+  };
   "/admin": {
     params: {};
   };
@@ -84,7 +87,7 @@ type Pages = {
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/register" | "/auth/login" | "/auth/register" | "/auth/logout" | "/auth/forgot-password" | "/auth/reset-password" | "/settings" | "/admin" | "/admin/users" | "/admin/gardens" | "/admin/invitations" | "/invitations/:token" | "/gardens" | "/gardens/new" | "/gardens/:gardenSlug" | "/gardens/:gardenSlug/edit" | "/gardens/:gardenSlug/members" | "/gardens/:gardenSlug/plants/:plantId";
+    page: "/" | "/register" | "/auth/login" | "/auth/register" | "/auth/logout" | "/auth/forgot-password" | "/auth/reset-password" | "/settings" | "/feedback" | "/admin" | "/admin/users" | "/admin/gardens" | "/admin/invitations" | "/invitations/:token" | "/gardens" | "/gardens/new" | "/gardens/:gardenSlug" | "/gardens/:gardenSlug/edit" | "/gardens/:gardenSlug/members" | "/gardens/:gardenSlug/plants/:plantId";
   };
   "routes/home.tsx": {
     id: "routes/home";
@@ -116,11 +119,15 @@ type RouteFiles = {
   };
   "routes/_app.tsx": {
     id: "routes/_app";
-    page: "/settings" | "/admin" | "/admin/users" | "/admin/gardens" | "/admin/invitations" | "/invitations/:token" | "/gardens" | "/gardens/new" | "/gardens/:gardenSlug" | "/gardens/:gardenSlug/edit" | "/gardens/:gardenSlug/members" | "/gardens/:gardenSlug/plants/:plantId";
+    page: "/settings" | "/feedback" | "/admin" | "/admin/users" | "/admin/gardens" | "/admin/invitations" | "/invitations/:token" | "/gardens" | "/gardens/new" | "/gardens/:gardenSlug" | "/gardens/:gardenSlug/edit" | "/gardens/:gardenSlug/members" | "/gardens/:gardenSlug/plants/:plantId";
   };
   "routes/_app.settings.tsx": {
     id: "routes/_app.settings";
     page: "/settings";
+  };
+  "routes/_app.feedback.tsx": {
+    id: "routes/_app.feedback";
+    page: "/feedback";
   };
   "routes/_app.admin.tsx": {
     id: "routes/_app.admin";
@@ -187,6 +194,7 @@ type RouteModules = {
   "routes/auth.reset-password": typeof import("./app/routes/auth.reset-password.tsx");
   "routes/_app": typeof import("./app/routes/_app.tsx");
   "routes/_app.settings": typeof import("./app/routes/_app.settings.tsx");
+  "routes/_app.feedback": typeof import("./app/routes/_app.feedback.tsx");
   "routes/_app.admin": typeof import("./app/routes/_app.admin.tsx");
   "routes/_app.admin._index": typeof import("./app/routes/_app.admin._index.tsx");
   "routes/_app.admin.users": typeof import("./app/routes/_app.admin.users.tsx");

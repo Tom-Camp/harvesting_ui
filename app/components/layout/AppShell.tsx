@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Form, Link, NavLink, Outlet } from "react-router";
+import { FeedbackModal } from "~/components/FeedbackModal";
 import type { User } from "~/lib/types";
 import logo from "~/assets/logo.svg";
 
@@ -9,6 +10,10 @@ interface AppShellProps {
 
 export function AppShell({ user }: AppShellProps) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const [feedbackKey, setFeedbackKey] = useState(0);
+
+  const openFeedback = () => { setFeedbackKey((k) => k + 1); setFeedbackOpen(true); };
 
   const displayName = user.first_name
     ? `${user.first_name}${user.last_name ? ` ${user.last_name}` : ""}`
@@ -53,6 +58,13 @@ export function AppShell({ user }: AppShellProps) {
           </div>
 
           <div className="hidden sm:flex items-center gap-4">
+            <button
+              type="button"
+              onClick={openFeedback}
+              className="text-sm text-text-muted hover:text-text-main transition-colors"
+            >
+              Feedback
+            </button>
             <NavLink
               to="/settings"
               className={({ isActive }) =>
@@ -130,6 +142,13 @@ export function AppShell({ user }: AppShellProps) {
             >
               {displayName}
             </NavLink>
+            <button
+              type="button"
+              onClick={() => { openFeedback(); closeMenu(); }}
+              className="text-sm text-text-muted hover:text-text-main transition-colors text-left"
+            >
+              Feedback
+            </button>
             <Form method="post" action="/auth/logout">
               <button
                 type="submit"
@@ -141,6 +160,7 @@ export function AppShell({ user }: AppShellProps) {
           </nav>
         )}
       </header>
+      <FeedbackModal key={feedbackKey} open={feedbackOpen} onClose={() => setFeedbackOpen(false)} />
       <Outlet />
     </div>
   );

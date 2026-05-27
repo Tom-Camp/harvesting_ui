@@ -4,6 +4,7 @@ import type {
   AdminInvitation,
   AdminInvitationPayload,
   CareInfo,
+  FeedbackPayload,
   ForgotPasswordPayload,
   Garden,
   GardenCreatePayload,
@@ -316,4 +317,12 @@ export async function listAdminInvitations(
   token: string
 ): Promise<AdminInvitation[]> {
   return client(token).get<AdminInvitation[]>("/admin/invitations");
+}
+
+// Feedback
+export async function submitFeedback(
+  token: string,
+  data: FeedbackPayload
+): Promise<{ issue_url: string }> {
+  return client(token).post<{ issue_url: string }>("/feedback", data);
 }
