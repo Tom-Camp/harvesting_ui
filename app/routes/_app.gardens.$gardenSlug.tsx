@@ -1,5 +1,5 @@
 import { isRouteErrorResponse, Link, Outlet, redirect, useLoaderData, useRouteError } from "react-router";
-import { deleteGarden, getGarden, getMe, getPlant, listMembers, listPlants } from "~/.server/api";
+import { deleteGarden, getGarden, getMe, listMembers, listPlants } from "~/.server/api";
 import { requireToken } from "~/.server/session";
 import type { Route } from "./+types/_app.gardens.$gardenSlug";
 import type { Garden, Plant } from "~/lib/types";
@@ -31,11 +31,8 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     listMembers(token, params.gardenSlug),
     getMe(token),
   ]);
-  const fullPlants = await Promise.all(
-    plants.map((p) => getPlant(token, params.gardenSlug, p.id))
-  );
   const isOwner = members.some((m) => m.user_id === me.id && m.role === "owner");
-  return { garden, plants: fullPlants, isOwner };
+  return { garden, plants, isOwner };
 }
 
 export default function GardenLayout() {
