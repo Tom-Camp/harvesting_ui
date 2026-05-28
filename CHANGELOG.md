@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.6](https://github.com/Tom-Camp/harvesting_ui/compare/v0.2.5...v0.2.6) (2026-05-28)
+
+
+### Bug Fixes
+
+* **gardenSlug:** removed duplicate request ([47a2e5c](https://github.com/Tom-Camp/harvesting_ui/commit/47a2e5cf80a08d86141912925b83dc206ffa0b98)), closes [#99](https://github.com/Tom-Camp/harvesting_ui/issues/99)
+
 ### [0.2.5](https://github.com/Tom-Camp/harvesting_ui/compare/v0.2.4...v0.2.5) (2026-05-27)
 
 
