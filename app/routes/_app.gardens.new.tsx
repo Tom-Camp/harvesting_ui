@@ -20,14 +20,14 @@ export async function action({ request }: Route.ActionArgs) {
 
   const name = String(form.get("name") ?? "");
   const location = String(form.get("location") ?? "");
-  const notes = String(form.get("notes") ?? "") || undefined;
+  const description = String(form.get("description") ?? "") || undefined;
 
   if (!name || !location) {
     return { error: "Name and location are required." };
   }
 
   try {
-    const garden = await createGarden(token, { name, location, notes });
+    const garden = await createGarden(token, { name, location, description });
     return redirect(`/gardens/${garden.slug}`);
   } catch (err) {
     if (err instanceof ApiClientError) {

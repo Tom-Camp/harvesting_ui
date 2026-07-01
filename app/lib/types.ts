@@ -42,7 +42,7 @@ export interface Garden {
   name: string;
   slug: string;
   location: string;
-  notes: string | null;
+  description: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -149,13 +149,13 @@ export interface LoginPayload {
 export interface GardenCreatePayload {
   name: string;
   location: string;
-  notes?: string;
+  description?: string;
 }
 
 export interface GardenUpdatePayload {
   name?: string;
   location?: string;
-  notes?: string;
+  description?: string;
 }
 
 export interface PlantCreatePayload {

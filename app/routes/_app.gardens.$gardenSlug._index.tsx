@@ -536,13 +536,13 @@ function GardenDashboardView({
 
   return (
     <>
-      {garden.notes && (
+      {garden.description && (
         <section className="mb-6">
           <article className="rounded-3xl border border-black/10 bg-surface p-5 shadow-soft sm:p-6">
             <div className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-text-muted">
               Description
             </div>
-            <p className="text-sm leading-7 text-text-main">{garden.notes}</p>
+            <p className="text-sm leading-7 text-text-main">{garden.description}</p>
           </article>
         </section>
       )}
