@@ -6,7 +6,7 @@ import { FormError } from "~/components/ui/FormError";
 import { Input } from "~/components/ui/Input";
 
 interface GardenFormProps {
-  defaultValues?: Pick<Garden, "name" | "location" | "notes">;
+  defaultValues?: Pick<Garden, "name" | "location" | "description">;
   error?: string;
   submitLabel: string;
 }
@@ -66,14 +66,14 @@ export function GardenForm({
         />
       </div>
       <div className="flex flex-col gap-1">
-        <label htmlFor="notes" className="text-sm font-medium text-gray-700">
+        <label htmlFor="description" className="text-sm font-medium text-gray-700">
           Description
         </label>
         <textarea
-          id="notes"
-          name="notes"
+          id="description"
+          name="description"
           rows={3}
-          defaultValue={defaultValues?.notes ?? ""}
+          defaultValue={defaultValues?.description ?? ""}
           className="rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-green-700 focus:ring-offset-1"
         />
       </div>

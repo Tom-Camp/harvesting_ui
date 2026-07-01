@@ -39,13 +39,13 @@ export async function action({ request, params }: Route.ActionArgs) {
 
   const name = String(form.get("name") ?? "") || undefined;
   const location = String(form.get("location") ?? "") || undefined;
-  const notes = String(form.get("notes") ?? "") || undefined;
+  const description = String(form.get("description") ?? "") || undefined;
 
   try {
     const garden = await updateGarden(token, params.gardenSlug, {
       name,
       location,
-      notes,
+      description,
     });
     return redirect(`/gardens/${garden.slug}`);
   } catch (err) {
