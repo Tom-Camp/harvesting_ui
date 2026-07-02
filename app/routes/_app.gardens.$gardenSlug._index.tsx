@@ -9,13 +9,17 @@ import {
   useSearchParams,
 } from "react-router";
 import {
+  createGardenNote,
   createHarvest,
   createNote,
   createPlant,
+  deleteGardenNote,
   deleteHarvest,
   deleteNote,
   deletePlant,
   getPlantCareInfo,
+  listGardenNotes,
+  updateGardenNote,
   updateHarvest,
   updateNote,
   updatePlant,
@@ -36,6 +40,9 @@ import { NoteModal } from "~/components/plants/NoteModal";
 import type { NoteModalState } from "~/components/plants/NoteModal";
 import { HarvestModal } from "~/components/plants/HarvestModal";
 import type { HarvestModalState } from "~/components/plants/HarvestModal";
+import { GardenNoteTimeline } from "~/components/gardens/GardenNoteTimeline";
+import { GardenNoteModal } from "~/components/gardens/GardenNoteModal";
+import type { GardenNoteModalState } from "~/components/gardens/GardenNoteModal";
 import { Calendar, ChartNoAxesCombined, ChevronDown, LayoutDashboard, Leaf, Search, Sprout, TrendingUp, Wheat } from "lucide-react";
 import { ProgressRing } from "~/components/ProgressRing";
 import { HarvestTrend } from "~/components/HarvestTrend";
@@ -66,6 +73,12 @@ function plantedFormatted(dateStr: string) {
     day: "numeric",
     year: "numeric",
   });
+}
+
+export async function loader({ request, params }: Route.LoaderArgs) {
+  const token = await requireToken(request);
+  const notes = await listGardenNotes(token, params.gardenSlug);
+  return { notes };
 }
 
 export async function action({ request, params }: Route.ActionArgs) {
@@ -146,6 +159,42 @@ export async function action({ request, params }: Route.ActionArgs) {
     const noteId = String(form.get("note_id") ?? "");
     try {
       await deleteNote(token, params.gardenSlug, plantId, noteId);
+      return { ok: true };
+    } catch (err) {
+      if (err instanceof ApiClientError) return { error: err.message };
+      return { error: "Failed to delete note." };
+    }
+  }
+
+  if (intent === "create_garden_note") {
+    const label = String(form.get("label") ?? "note") as NoteType;
+    const note = String(form.get("note") ?? "") || undefined;
+    try {
+      await createGardenNote(token, params.gardenSlug, { label, note });
+      return { ok: true };
+    } catch (err) {
+      if (err instanceof ApiClientError) return { error: err.message };
+      return { error: "Failed to create note." };
+    }
+  }
+
+  if (intent === "update_garden_note") {
+    const noteId = String(form.get("note_id") ?? "");
+    const label = (String(form.get("label") ?? "") || undefined) as NoteType | undefined;
+    const note = String(form.get("note") ?? "") || undefined;
+    try {
+      await updateGardenNote(token, params.gardenSlug, noteId, { label, note });
+      return { ok: true };
+    } catch (err) {
+      if (err instanceof ApiClientError) return { error: err.message };
+      return { error: "Failed to update note." };
+    }
+  }
+
+  if (intent === "delete_garden_note") {
+    const noteId = String(form.get("note_id") ?? "");
+    try {
+      await deleteGardenNote(token, params.gardenSlug, noteId);
       return { ok: true };
     } catch (err) {
       if (err instanceof ApiClientError) return { error: err.message };
@@ -507,12 +556,16 @@ function PlantDetail({
 function GardenDashboardView({
   garden,
   plants,
+  notes,
   onAddPlant,
 }: {
   garden: Garden;
   plants: Plant[];
+  notes: Note[];
   onAddPlant: () => void;
 }) {
+  const [gardenNoteModal, setGardenNoteModal] = useState<GardenNoteModalState | null>(null);
+
   const ageMs = now - new Date(garden.created_at).getTime();
   const ageYears = ageMs / (365.25 * 86_400_000);
   const ageDisplay =
@@ -607,6 +660,27 @@ function GardenDashboardView({
         </section>
       )}
 
+      <section className="mt-6">
+        <article className="rounded-3xl border border-black/10 bg-surface p-5 shadow-soft sm:p-6">
+          <div className="mb-5 flex items-center justify-between">
+            <span className="text-xs font-semibold uppercase tracking-[0.16em] text-text-muted">
+              Garden Notes
+            </span>
+            <button
+              onClick={() => setGardenNoteModal({ mode: "create" })}
+              className="inline-flex items-center rounded-full bg-primary px-3 py-1.5 text-xs font-medium text-white transition hover:bg-primary-strong"
+            >
+              + Add a Note
+            </button>
+          </div>
+          <GardenNoteTimeline
+            notes={notes}
+            color="#3a7a45"
+            onNoteClick={(note: Note) => setGardenNoteModal({ mode: "view", note })}
+          />
+        </article>
+      </section>
+
       <div className="mt-8">
         <button
           onClick={onAddPlant}
@@ -615,6 +689,12 @@ function GardenDashboardView({
           + Add a plant
         </button>
       </div>
+
+      <GardenNoteModal
+        state={gardenNoteModal}
+        onClose={() => setGardenNoteModal(null)}
+        onEdit={(note: Note) => setGardenNoteModal({ mode: "edit", note })}
+      />
     </>
   );
 }
@@ -729,7 +809,8 @@ function MobilePlantPicker({
   );
 }
 
-export default function GardenDashboard() {
+export default function GardenDashboard({ loaderData }: Route.ComponentProps) {
+  const { notes } = loaderData;
   const { garden, plants } = useOutletContext<GardenOutletContext>();
   const [searchParams] = useSearchParams();
 
@@ -805,6 +886,7 @@ export default function GardenDashboard() {
             <GardenDashboardView
               garden={garden}
               plants={plants}
+              notes={notes}
               onAddPlant={() => setPlantModal({ mode: "create" })}
             />
           )}

@@ -114,6 +114,42 @@ export async function deleteGarden(
   return client(token).delete(`/gardens/${slug}`);
 }
 
+// Garden notes
+export async function listGardenNotes(
+  token: string,
+  gardenSlug: string
+): Promise<Note[]> {
+  return client(token).get<Note[]>(`/gardens/${gardenSlug}/notes`);
+}
+
+export async function createGardenNote(
+  token: string,
+  gardenSlug: string,
+  data: NoteCreatePayload
+): Promise<Note> {
+  return client(token).post<Note>(`/gardens/${gardenSlug}/notes`, data);
+}
+
+export async function updateGardenNote(
+  token: string,
+  gardenSlug: string,
+  noteId: string,
+  data: NoteUpdatePayload
+): Promise<Note> {
+  return client(token).patch<Note>(
+    `/gardens/${gardenSlug}/notes/${noteId}`,
+    data
+  );
+}
+
+export async function deleteGardenNote(
+  token: string,
+  gardenSlug: string,
+  noteId: string
+): Promise<void> {
+  return client(token).delete(`/gardens/${gardenSlug}/notes/${noteId}`);
+}
+
 // Plants
 export async function listPlants(
   token: string,
