@@ -20,6 +20,8 @@ interface PlantSidebarProps {
   onSelect: (id: string) => void;
   onAddPlant: () => void;
   onShowDashboard: () => void;
+  typeFilter: PlantType | null;
+  onClearTypeFilter: () => void;
 }
 
 function PlantButton({
@@ -64,6 +66,8 @@ export function PlantSidebar({
   onSelect,
   onAddPlant,
   onShowDashboard,
+  typeFilter,
+  onClearTypeFilter,
 }: PlantSidebarProps) {
   const [query, setQuery] = useState("");
 
@@ -132,6 +136,20 @@ export function PlantSidebar({
           {gardenName}
         </div>
         <div className="mt-0.5 text-xs text-text-muted">Plants</div>
+        {typeFilter && (
+          <div className="mt-2">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-primary-soft px-2.5 py-1 text-xs font-medium text-primary">
+              <span
+                className="h-2 w-2 shrink-0 rounded-full"
+                style={{ backgroundColor: plantTypeColors[typeFilter] }}
+              />
+              <span className="capitalize">{typeFilter}</span>
+              <button onClick={onClearTypeFilter} aria-label="Clear type filter">
+                <X className="h-3 w-3" />
+              </button>
+            </span>
+          </div>
+        )}
       </div>
 
       {plants.length > 0 && (
@@ -157,7 +175,9 @@ export function PlantSidebar({
       )}
 
       {plants.length === 0 ? (
-        <p className="px-3 py-2 text-sm text-text-faint">No plants yet.</p>
+        <p className="px-3 py-2 text-sm text-text-faint">
+          {typeFilter ? "No plants of this type." : "No plants yet."}
+        </p>
       ) : filteredPlants ? (
         filteredPlants.length === 0 ? (
           <p className="px-3 py-2 text-sm text-text-faint">No plants match.</p>
