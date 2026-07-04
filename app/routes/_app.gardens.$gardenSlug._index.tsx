@@ -43,7 +43,7 @@ import type { HarvestModalState } from "~/components/plants/HarvestModal";
 import { GardenNoteTimeline } from "~/components/gardens/GardenNoteTimeline";
 import { GardenNoteModal } from "~/components/gardens/GardenNoteModal";
 import type { GardenNoteModalState } from "~/components/gardens/GardenNoteModal";
-import { Calendar, ChartNoAxesCombined, ChevronDown, LayoutDashboard, Leaf, Search, Sprout, TrendingUp, Wheat } from "lucide-react";
+import { Calendar, ChartNoAxesCombined, ChevronDown, LayoutDashboard, Leaf, Search, Sprout, TrendingUp, Wheat, X } from "lucide-react";
 import { ProgressRing } from "~/components/ProgressRing";
 import { HarvestTrend } from "~/components/HarvestTrend";
 
@@ -558,11 +558,15 @@ function GardenDashboardView({
   plants,
   notes,
   onAddPlant,
+  activeTypeFilter,
+  onToggleTypeFilter,
 }: {
   garden: Garden;
   plants: Plant[];
   notes: Note[];
   onAddPlant: () => void;
+  activeTypeFilter: PlantType | null;
+  onToggleTypeFilter: (type: PlantType) => void;
 }) {
   const [gardenNoteModal, setGardenNoteModal] = useState<GardenNoteModalState | null>(null);
 
@@ -634,14 +638,30 @@ function GardenDashboardView({
       {typeEntries.length > 0 && (
         <section className="mt-6">
           <article className="rounded-3xl border border-black/10 bg-surface p-5 shadow-soft sm:p-6">
-            <div className="mb-4 text-xs font-semibold uppercase tracking-[0.16em] text-text-muted">
-              Plants by Type
+            <div className="mb-4 flex items-center justify-between">
+              <div className="text-xs font-semibold uppercase tracking-[0.16em] text-text-muted">
+                Plants by Type
+              </div>
+              {activeTypeFilter && (
+                <button
+                  onClick={() => onToggleTypeFilter(activeTypeFilter)}
+                  className="cursor-pointer text-xs font-medium text-primary hover:text-primary-strong"
+                >
+                  Clear filter
+                </button>
+              )}
             </div>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4">
               {typeEntries.map(([type, count]) => (
-                <div
+                <button
                   key={type}
-                  className="flex items-center gap-2.5 rounded-2xl border border-black/[0.06] bg-bg px-4 py-3"
+                  onClick={() => onToggleTypeFilter(type)}
+                  className={[
+                    "flex cursor-pointer items-center gap-2.5 rounded-2xl border px-4 py-3 text-left transition",
+                    activeTypeFilter === type
+                      ? "border-primary/40 bg-primary-soft ring-1 ring-primary/40"
+                      : "border-black/[0.06] bg-bg hover:bg-black/[0.03]",
+                  ].join(" ")}
                 >
                   <span
                     className="h-2.5 w-2.5 shrink-0 rounded-full"
@@ -653,7 +673,7 @@ function GardenDashboardView({
                       {count} plant{count !== 1 ? "s" : ""}
                     </p>
                   </div>
-                </div>
+                </button>
               ))}
             </div>
           </article>
@@ -703,10 +723,14 @@ function MobilePlantPicker({
   plants,
   selectedId,
   onSelect,
+  typeFilter,
+  onClearTypeFilter,
 }: {
   plants: Plant[];
   selectedId: string | null;
   onSelect: (id: string | null) => void;
+  typeFilter: PlantType | null;
+  onClearTypeFilter: () => void;
 }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -730,6 +754,20 @@ function MobilePlantPicker({
 
   return (
     <div className="lg:hidden border-b border-black/10 px-4 py-3">
+      {typeFilter && (
+        <div className="mb-2 flex items-center gap-1.5">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary-soft px-2.5 py-1 text-xs font-medium text-primary">
+            <span
+              className="h-2 w-2 shrink-0 rounded-full"
+              style={{ backgroundColor: plantTypeColors[typeFilter] }}
+            />
+            <span className="capitalize">{typeFilter}</span>
+            <button onClick={onClearTypeFilter} aria-label="Clear type filter">
+              <X className="h-3 w-3" />
+            </button>
+          </span>
+        </div>
+      )}
       <div className="relative">
         {open && (
           <div className="fixed inset-0 z-20" onClick={close} />
@@ -821,29 +859,40 @@ export default function GardenDashboard({ loaderData }: Route.ComponentProps) {
   });
 
   const [plantModal, setPlantModal] = useState<PlantModalState | null>(null);
+  const [typeFilter, setTypeFilter] = useState<PlantType | null>(null);
+
+  const toggleTypeFilter = (type: PlantType) => {
+    setTypeFilter((current) => (current === type ? null : type));
+  };
 
   // If the selected plant was deleted fall back to the dashboard (null).
   const effectiveSelectedId =
     selectedId !== null && plants.some((p) => p.id === selectedId) ? selectedId : null;
   const selectedPlant = plants.find((p) => p.id === effectiveSelectedId) ?? null;
 
+  const sidebarPlants = typeFilter ? plants.filter((p) => p.plant_type === typeFilter) : plants;
+
   return (
     <div className="flex">
       <PlantSidebar
-        plants={plants}
+        plants={sidebarPlants}
         gardenName={garden.name}
         selectedId={effectiveSelectedId}
         showDashboard={effectiveSelectedId === null}
         onSelect={setSelectedId}
         onAddPlant={() => setPlantModal({ mode: "create" })}
         onShowDashboard={() => setSelectedId(null)}
+        typeFilter={typeFilter}
+        onClearTypeFilter={() => setTypeFilter(null)}
       />
 
       <div className="min-w-0 flex-1">
         <MobilePlantPicker
-          plants={plants}
+          plants={sidebarPlants}
           selectedId={effectiveSelectedId}
           onSelect={setSelectedId}
+          typeFilter={typeFilter}
+          onClearTypeFilter={() => setTypeFilter(null)}
         />
 
         <main className="w-full max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
@@ -888,6 +937,8 @@ export default function GardenDashboard({ loaderData }: Route.ComponentProps) {
               plants={plants}
               notes={notes}
               onAddPlant={() => setPlantModal({ mode: "create" })}
+              activeTypeFilter={typeFilter}
+              onToggleTypeFilter={toggleTypeFilter}
             />
           )}
         </main>
