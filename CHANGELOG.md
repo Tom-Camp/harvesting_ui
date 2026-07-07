@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.3.0](https://github.com/Tom-Camp/harvesting_ui/compare/v0.2.6...v0.3.0) (2026-07-07)
+
+
+### Features
+
+* **dashboard:** filter plant types ([73c8596](https://github.com/Tom-Camp/harvesting_ui/commit/73c85964763f49295d19e3c6b23aae51376344e2)), closes [#109](https://github.com/Tom-Camp/harvesting_ui/issues/109)
+* **GardenNote:** adding garden note ([e349aef](https://github.com/Tom-Camp/harvesting_ui/commit/e349aef337175c33f0b22e935da530babc311d75)), closes [#108](https://github.com/Tom-Camp/harvesting_ui/issues/108)
+
 ### [0.2.6](https://github.com/Tom-Camp/harvesting_ui/compare/v0.2.5...v0.2.6) (2026-05-28)
 
 
