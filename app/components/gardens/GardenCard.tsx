@@ -25,8 +25,8 @@ export function GardenCard({ garden }: GardenCardProps) {
           Edit
         </Link>
       </div>
-      {garden.notes && (
-        <p className="text-sm text-gray-600 line-clamp-2">{garden.notes}</p>
+      {garden.description && (
+        <p className="text-sm text-gray-600 line-clamp-2">{garden.description}</p>
       )}
     </div>
   );
