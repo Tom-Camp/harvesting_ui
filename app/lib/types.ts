@@ -191,6 +191,7 @@ export interface NoteCreatePayload {
 export interface NoteUpdatePayload {
   label?: NoteType;
   note?: string;
+  created_at?: string;
 }
 
 export interface UserUpdatePayload {
