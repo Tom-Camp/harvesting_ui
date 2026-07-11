@@ -182,8 +182,9 @@ export async function action({ request, params }: Route.ActionArgs) {
     const noteId = String(form.get("note_id") ?? "");
     const label = (String(form.get("label") ?? "") || undefined) as NoteType | undefined;
     const note = String(form.get("note") ?? "") || undefined;
+    const created_at = String(form.get("created_at") ?? "") || undefined;
     try {
-      await updateGardenNote(token, params.gardenSlug, noteId, { label, note });
+      await updateGardenNote(token, params.gardenSlug, noteId, { label, note, created_at });
       return { ok: true };
     } catch (err) {
       if (err instanceof ApiClientError) return { error: err.message };
