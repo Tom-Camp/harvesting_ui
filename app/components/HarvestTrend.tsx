@@ -1,4 +1,4 @@
-import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import type { Plant } from '../lib/types';
 
 const plantTypeColors: Record<string, string> = {
@@ -28,13 +28,13 @@ export function HarvestTrend({ plant }: { plant: Plant }) {
   return (
     <div className="h-40">
       <ResponsiveContainer width="100%" height="100%">
-        <AreaChart data={data}>
+        <BarChart data={data}>
           <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
           <XAxis dataKey="date" tick={{ fontSize: 11, fill: 'var(--color-text-muted)' }} axisLine={false} tickLine={false} />
           <YAxis tick={{ fontSize: 11, fill: 'var(--color-text-muted)' }} axisLine={false} tickLine={false} width={30} />
           <Tooltip />
-          <Area type="monotone" dataKey="value" stroke={color} fill={color} fillOpacity={0.16} strokeWidth={2.5} />
-        </AreaChart>
+          <Bar dataKey="value" fill={color} radius={[4, 4, 0, 0]} />
+        </BarChart>
       </ResponsiveContainer>
     </div>
   );
