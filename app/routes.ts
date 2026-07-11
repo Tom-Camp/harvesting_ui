@@ -23,6 +23,15 @@ export default [
   layout("routes/_app.tsx", [
     route("settings", "routes/_app.settings.tsx"),
     route("feedback", "routes/_app.feedback.tsx"),
+    route("help", "routes/_app.help.tsx", [
+      index("routes/_app.help._index.tsx"),
+      route("gardens", "routes/_app.help.gardens.tsx"),
+      route("plants", "routes/_app.help.plants.tsx"),
+      route("notes", "routes/_app.help.notes.tsx"),
+      route("harvests", "routes/_app.help.harvests.tsx"),
+      route("ai-tips", "routes/_app.help.ai-tips.tsx"),
+      route("account", "routes/_app.help.account.tsx"),
+    ]),
     ...prefix("admin", [
       layout("routes/_app.admin.tsx", [
         index("routes/_app.admin._index.tsx"),
