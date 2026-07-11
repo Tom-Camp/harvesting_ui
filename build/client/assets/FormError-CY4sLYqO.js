@@ -1,0 +1,1 @@
+import{t as e}from"./jsx-runtime-LF-cI-GV.js";var t=e();function n({message:e}){return e?(0,t.jsx)(`div`,{className:`rounded-md bg-red-50 px-4 py-3 text-sm text-red-700 border border-red-200`,children:e}):null}export{n as t};

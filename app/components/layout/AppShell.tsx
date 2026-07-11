@@ -58,6 +58,16 @@ export function AppShell({ user }: AppShellProps) {
           </div>
 
           <div className="hidden sm:flex items-center gap-4">
+            <NavLink
+              to="/help"
+              className={({ isActive }) =>
+                `text-sm transition-colors ${
+                  isActive ? "text-primary font-medium" : "text-text-muted hover:text-text-main"
+                }`
+              }
+            >
+              Help
+            </NavLink>
             <button
               type="button"
               onClick={openFeedback}
@@ -141,6 +151,17 @@ export function AppShell({ user }: AppShellProps) {
               }
             >
               {displayName}
+            </NavLink>
+            <NavLink
+              to="/help"
+              onClick={closeMenu}
+              className={({ isActive }) =>
+                `text-sm transition-colors ${
+                  isActive ? "text-primary font-medium" : "text-text-muted hover:text-text-main"
+                }`
+              }
+            >
+              Help
             </NavLink>
             <button
               type="button"

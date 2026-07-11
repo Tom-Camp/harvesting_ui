@@ -38,6 +38,27 @@ type Pages = {
   "/feedback": {
     params: {};
   };
+  "/help": {
+    params: {};
+  };
+  "/help/gardens": {
+    params: {};
+  };
+  "/help/plants": {
+    params: {};
+  };
+  "/help/notes": {
+    params: {};
+  };
+  "/help/harvests": {
+    params: {};
+  };
+  "/help/ai-tips": {
+    params: {};
+  };
+  "/help/account": {
+    params: {};
+  };
   "/admin": {
     params: {};
   };
@@ -87,7 +108,7 @@ type Pages = {
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/register" | "/auth/login" | "/auth/register" | "/auth/logout" | "/auth/forgot-password" | "/auth/reset-password" | "/settings" | "/feedback" | "/admin" | "/admin/users" | "/admin/gardens" | "/admin/invitations" | "/invitations/:token" | "/gardens" | "/gardens/new" | "/gardens/:gardenSlug" | "/gardens/:gardenSlug/edit" | "/gardens/:gardenSlug/members" | "/gardens/:gardenSlug/plants/:plantId";
+    page: "/" | "/register" | "/auth/login" | "/auth/register" | "/auth/logout" | "/auth/forgot-password" | "/auth/reset-password" | "/settings" | "/feedback" | "/help" | "/help/gardens" | "/help/plants" | "/help/notes" | "/help/harvests" | "/help/ai-tips" | "/help/account" | "/admin" | "/admin/users" | "/admin/gardens" | "/admin/invitations" | "/invitations/:token" | "/gardens" | "/gardens/new" | "/gardens/:gardenSlug" | "/gardens/:gardenSlug/edit" | "/gardens/:gardenSlug/members" | "/gardens/:gardenSlug/plants/:plantId";
   };
   "routes/home.tsx": {
     id: "routes/home";
@@ -119,7 +140,7 @@ type RouteFiles = {
   };
   "routes/_app.tsx": {
     id: "routes/_app";
-    page: "/settings" | "/feedback" | "/admin" | "/admin/users" | "/admin/gardens" | "/admin/invitations" | "/invitations/:token" | "/gardens" | "/gardens/new" | "/gardens/:gardenSlug" | "/gardens/:gardenSlug/edit" | "/gardens/:gardenSlug/members" | "/gardens/:gardenSlug/plants/:plantId";
+    page: "/settings" | "/feedback" | "/help" | "/help/gardens" | "/help/plants" | "/help/notes" | "/help/harvests" | "/help/ai-tips" | "/help/account" | "/admin" | "/admin/users" | "/admin/gardens" | "/admin/invitations" | "/invitations/:token" | "/gardens" | "/gardens/new" | "/gardens/:gardenSlug" | "/gardens/:gardenSlug/edit" | "/gardens/:gardenSlug/members" | "/gardens/:gardenSlug/plants/:plantId";
   };
   "routes/_app.settings.tsx": {
     id: "routes/_app.settings";
@@ -128,6 +149,38 @@ type RouteFiles = {
   "routes/_app.feedback.tsx": {
     id: "routes/_app.feedback";
     page: "/feedback";
+  };
+  "routes/_app.help.tsx": {
+    id: "routes/_app.help";
+    page: "/help" | "/help/gardens" | "/help/plants" | "/help/notes" | "/help/harvests" | "/help/ai-tips" | "/help/account";
+  };
+  "routes/_app.help._index.tsx": {
+    id: "routes/_app.help._index";
+    page: "/help";
+  };
+  "routes/_app.help.gardens.tsx": {
+    id: "routes/_app.help.gardens";
+    page: "/help/gardens";
+  };
+  "routes/_app.help.plants.tsx": {
+    id: "routes/_app.help.plants";
+    page: "/help/plants";
+  };
+  "routes/_app.help.notes.tsx": {
+    id: "routes/_app.help.notes";
+    page: "/help/notes";
+  };
+  "routes/_app.help.harvests.tsx": {
+    id: "routes/_app.help.harvests";
+    page: "/help/harvests";
+  };
+  "routes/_app.help.ai-tips.tsx": {
+    id: "routes/_app.help.ai-tips";
+    page: "/help/ai-tips";
+  };
+  "routes/_app.help.account.tsx": {
+    id: "routes/_app.help.account";
+    page: "/help/account";
   };
   "routes/_app.admin.tsx": {
     id: "routes/_app.admin";
@@ -195,6 +248,14 @@ type RouteModules = {
   "routes/_app": typeof import("./app/routes/_app.tsx");
   "routes/_app.settings": typeof import("./app/routes/_app.settings.tsx");
   "routes/_app.feedback": typeof import("./app/routes/_app.feedback.tsx");
+  "routes/_app.help": typeof import("./app/routes/_app.help.tsx");
+  "routes/_app.help._index": typeof import("./app/routes/_app.help._index.tsx");
+  "routes/_app.help.gardens": typeof import("./app/routes/_app.help.gardens.tsx");
+  "routes/_app.help.plants": typeof import("./app/routes/_app.help.plants.tsx");
+  "routes/_app.help.notes": typeof import("./app/routes/_app.help.notes.tsx");
+  "routes/_app.help.harvests": typeof import("./app/routes/_app.help.harvests.tsx");
+  "routes/_app.help.ai-tips": typeof import("./app/routes/_app.help.ai-tips.tsx");
+  "routes/_app.help.account": typeof import("./app/routes/_app.help.account.tsx");
   "routes/_app.admin": typeof import("./app/routes/_app.admin.tsx");
   "routes/_app.admin._index": typeof import("./app/routes/_app.admin._index.tsx");
   "routes/_app.admin.users": typeof import("./app/routes/_app.admin.users.tsx");
