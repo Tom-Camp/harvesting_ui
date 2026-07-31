@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.1](https://github.com/Tom-Camp/harvesting_ui/compare/v0.3.0...v0.3.1) (2026-07-31)
+
+
+### Features
+
+* **app.help:** adding help docs ([68a5c45](https://github.com/Tom-Camp/harvesting_ui/commit/68a5c45a56de4bd2cfb7f8b7365034dfcc4719b8)), closes [#47](https://github.com/Tom-Camp/harvesting_ui/issues/47)
+
 ## [0.3.0](https://github.com/Tom-Camp/harvesting_ui/compare/v0.2.6...v0.3.0) (2026-07-07)
 
 

@@ -43,7 +43,7 @@ import type { HarvestModalState } from "~/components/plants/HarvestModal";
 import { GardenNoteTimeline } from "~/components/gardens/GardenNoteTimeline";
 import { GardenNoteModal } from "~/components/gardens/GardenNoteModal";
 import type { GardenNoteModalState } from "~/components/gardens/GardenNoteModal";
-import { Calendar, ChartNoAxesCombined, ChevronDown, LayoutDashboard, Leaf, Search, Sprout, TrendingUp, Wheat, X } from "lucide-react";
+import { Calendar, ChartNoAxesCombined, ChevronDown, LayoutDashboard, Search, Sprout, TrendingUp, Wheat, X } from "lucide-react";
 import { ProgressRing } from "~/components/ProgressRing";
 import { HarvestTrend } from "~/components/HarvestTrend";
 
@@ -182,8 +182,9 @@ export async function action({ request, params }: Route.ActionArgs) {
     const noteId = String(form.get("note_id") ?? "");
     const label = (String(form.get("label") ?? "") || undefined) as NoteType | undefined;
     const note = String(form.get("note") ?? "") || undefined;
+    const created_at = String(form.get("created_at") ?? "") || undefined;
     try {
-      await updateGardenNote(token, params.gardenSlug, noteId, { label, note });
+      await updateGardenNote(token, params.gardenSlug, noteId, { label, note, created_at });
       return { ok: true };
     } catch (err) {
       if (err instanceof ApiClientError) return { error: err.message };
@@ -585,11 +586,6 @@ function GardenDashboardView({
     (a, b) => b[1] - a[1]
   );
 
-  const lastAdded = plants.reduce<Plant | null>(
-    (latest, p) =>
-      !latest || new Date(p.created_at) > new Date(latest.created_at) ? p : latest,
-    null
-  );
 
   return (
     <>
@@ -604,7 +600,7 @@ function GardenDashboardView({
         </section>
       )}
 
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+      <section className="grid gap-4 sm:grid-cols-2">
         <PlantKPICard
           label="Garden Age"
           value={ageDisplay}
@@ -621,18 +617,6 @@ function GardenDashboardView({
           }
           Icon={Sprout}
         />
-        {lastAdded && (
-          <PlantKPICard
-            label="Last Plant Added"
-            value={lastAdded.species}
-            meta={new Date(lastAdded.created_at).toLocaleDateString("en-US", {
-              month: "long",
-              day: "numeric",
-              year: "numeric",
-            })}
-            Icon={Leaf}
-          />
-        )}
       </section>
 
       {typeEntries.length > 0 && (

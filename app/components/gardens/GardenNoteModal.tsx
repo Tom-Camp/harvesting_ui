@@ -171,6 +171,19 @@ export function GardenNoteModal({ state, onClose, onEdit }: GardenNoteModalProps
                 ))}
               </select>
             </div>
+            {state?.mode === "edit" && (
+              <div>
+                <label className="mb-1.5 block text-xs font-medium text-text-muted">
+                  Date
+                </label>
+                <input
+                  type="date"
+                  name="created_at"
+                  defaultValue={note?.created_at ? note.created_at.slice(0, 10) : ""}
+                  className="w-full rounded-xl border border-black/10 bg-surface px-3 py-2 text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-primary/30"
+                />
+              </div>
+            )}
             <div>
               <label className="mb-1.5 block text-xs font-medium text-text-muted">
                 Note
